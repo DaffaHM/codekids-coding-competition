@@ -19,8 +19,8 @@ export default function Footer() {
   const navigationLinks = [
     { name: 'Home', href: '/', icon: <RiHome5Line className="w-5 h-5" /> },
     { name: 'Learn', href: '/learn', icon: <RiBookOpenLine className="w-5 h-5" /> },
-    { name: 'Certificate', href: '/certificate', icon: <RiAwardLine className="w-5 h-5" /> },
-    { name: 'About', href: '/about', icon: <RiLightbulbLine className="w-5 h-5" /> },
+    { name: 'Certificate', href: '/learn', icon: <RiAwardLine className="w-5 h-5" /> },
+    { name: 'About', href: '/#why-codekids', icon: <RiLightbulbLine className="w-5 h-5" /> },
   ];
 
   const materiLinks = [

@@ -148,12 +148,12 @@ export default function Navbar() {
     },
     {
       name: 'Certificate',
-      href: '/certificate',
+      href: '/learn',
       icon: <RiAwardLine className="w-4.5 h-4.5 stroke-[0.3]" />,
     },
     {
       name: 'About',
-      href: '#about',
+      href: '/#why-codekids',
       icon: <RiLightbulbLine className="w-4.5 h-4.5 stroke-[0.3]" />,
     },
   ];
