@@ -149,7 +149,7 @@ export default function Navbar() {
     },
     {
       name: 'Certificate',
-      href: '/learn',
+      href: '/learn#certificate',
       icon: <RiAwardLine className="w-4.5 h-4.5 stroke-[0.3]" />,
     },
     {
@@ -171,15 +171,15 @@ export default function Navbar() {
         />
       )}
 
-      <header className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 pointer-events-none ${
+      <header className={`fixed top-0 inset-x-0 w-full z-50 pointer-events-none transition-all duration-300 ${
         isScrolled 
-          ? 'pt-2.5 sm:pt-3.5 pb-2 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto' 
-          : 'max-w-7xl bg-transparent rounded-none px-2 sm:px-4 py-1.5 border border-transparent shadow-none'
+          ? 'pt-2.5 sm:pt-3.5 px-3 sm:px-6 lg:px-8' 
+          : 'pt-2 sm:pt-3 px-4 sm:px-6 lg:px-8'
       }`}>
-        <div className={`w-full mx-auto flex items-center justify-between transition-all duration-300 pointer-events-auto ${
+        <div className={`mx-auto flex items-center justify-between pointer-events-auto transition-all duration-300 ${
           isScrolled 
-            ? 'max-w-6xl bg-white/95 backdrop-blur-md rounded-full px-4 sm:px-6 py-2 sm:py-2.5 border border-blue-100/80 shadow-md' 
-            : 'max-w-7xl bg-transparent rounded-none px-2 sm:px-4 py-1.5 border border-transparent shadow-none'
+            ? 'max-w-6xl bg-white/95 backdrop-blur-md rounded-full px-4 sm:px-6 py-2 sm:py-2.5 border border-blue-100/90 shadow-lg' 
+            : 'max-w-7xl bg-transparent rounded-none px-0 py-1 sm:py-2 border border-transparent shadow-none'
         }`}>
           
           {/* CodeKids Logo (Left) */}

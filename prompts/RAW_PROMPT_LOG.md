@@ -4599,15 +4599,118 @@ Rendered fewer hooks than expected. This may be caused by an accidental early re
   - Memastikan seluruh Hooks selalu dipanggil dalam urutan yang konsisten 100% pada semua rute halaman.
   - Verifikasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
 
+---
 
+## Prompt 117
 
+Tanggal: 2026-10-09
 
+Task: Push React Rules of Hooks Navbar Fix to GitHub
 
+### Prompt Asli
 
+```text
+push git
+```
 
+### Ringkasan Hasil
 
+- **Staging & Commit**:
+  - Menambahkan file perbaikan [`src/components/layout/Navbar.tsx`](file:///d:/Coding/codekids/src/components/layout/Navbar.tsx) dan log prompt.
+  - Membuat commit: `"fix: perbaiki urutan panggilan React Hooks pada Navbar.tsx untuk mengatasi error hydration"`.
+- **Push Remote Repository**:
+  - Berhasil meng-push commit ke GitHub remote `main` branch (`git push origin main`), memicu Vercel re-deployment secara otomatis.
 
+---
 
+## Prompt 118
 
+Tanggal: 2026-10-09
 
+Task: Hide Footer Component on Lesson/Materi Pages (/learn/[topicId])
 
+### Prompt Asli
+
+```text
+saat masuk materi footer gausah di masukin atau di hide aja
+```
+
+### Ringkasan Hasil
+
+- **Penyembunyian Footer pada Halaman Materi (`src/components/layout/Footer.tsx`)**:
+  - Memperbarui komponen [`Footer.tsx`](file:///d:/Coding/codekids/src/components/layout/Footer.tsx) dengan menambahkan kondisi pengecekan rute `pathname.startsWith('/learn/')`.
+  - Ketika pengguna memasuki halaman materi atau kuis (seperti `/learn/level-1`, `/learn/level-2`, dll.), komponen `Footer` secara otomatis mengembalikan `null` sehingga bagian footer tidak lagi tampil pada halaman pembelajaran.
+  - Verifikasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+---
+
+## Prompt 119
+
+Tanggal: 2026-10-09
+
+Task: Fix Navbar Layout Positioning, Alignment, Floating Pill Style & Remove Double Active Highlight
+
+### Prompt Asli
+
+```text
+navnya kenapa posisi nya gini coba perbaiki
+```
+
+### Ringkasan Hasil
+
+- **Analisis Masalah Tata Letak Navbar**:
+  - Pada kondisi belum ter-scroll (`isScrolled === false`), komponen `Navbar` menggunakan tata letak `max-w-7xl` tanpa `mx-auto` pada container `fixed top-0 left-0 right-0`, sehingga pada layar lebar Navbar bergeser ke kiri secara tidak proporsional dan tidak sejajar dengan konten tengah halaman.
+  - Terdapat sorotan aktif ganda (*double active highlight*) berwarna biru pada menu `Learn` dan `Certificate` secara bersamaan ketika berada di `/learn`, disebabkan nilai `href` untuk `Certificate` disamakan dengan `href: '/learn'`.
+- **Penyempurnaan Tampilan & Positioning (`src/components/layout/Navbar.tsx`)**:
+  - Mengubah rute tautan item `Certificate` menjadi `href: '/learn#certificate'` agar hanya menu `Learn` yang tersorot aktif saat pengguna membuka halaman `/learn`.
+  - Memperbarui struktur container `header` menggunakan `fixed top-0 inset-x-0 z-50 pointer-events-none pt-2.5 sm:pt-3.5 px-3 sm:px-6 lg:px-8` dan inner container `max-w-6xl mx-auto rounded-full bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-md` secara konsisten.
+  - Hasil perbaikan membuat Navbar melayang (*floating pill navbar*) secara sempurna dan selalu presisi di tengah layar (*centered alignment*), memberikan visual modern dan rapi di semua resolusi perangkat.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` berhasil lulus 100% tanpa error.
+
+---
+
+## Prompt 120
+
+Tanggal: 2026-10-09
+
+Task: Refine Navbar 2-State Behavior (Flat Unscrolled vs Floating Pill Scrolled)
+
+### Prompt Asli
+
+```text
+loh kan ada 2 keadaan ,saat belum di scroll dan sesudah , nah untuk yang sebelum di scroll kan emang belum floating dan kapsul, coba perbaiki lagi
+```
+
+### Ringkasan Hasil
+
+- **Penyesuaian 2 Kondisi Tampilan Navbar (`src/components/layout/Navbar.tsx`)**:
+  - **Kondisi 1: Sebelum di-scroll (`isScrolled === false`)**:
+    - Navbar tampil melintang sejajar margin konten utama web dengan container `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`.
+    - Tanpa bentuk kapsul/kaca melayang (`bg-transparent rounded-none px-0 py-1 sm:py-2 border-transparent shadow-none`).
+    - Logo di sebelah kiri rata dengan batas konten halaman, tautan menu di tengah, dan tombol CTA di kanan.
+  - **Kondisi 2: Setelah di-scroll (`isScrolled === true`)**:
+    - Navbar bertransformasi menjadi kapsul melayang modern (*floating capsule navbar*) dengan `max-w-6xl mx-auto bg-white/95 backdrop-blur-md rounded-full px-4 sm:px-6 py-2 sm:py-2.5 border border-blue-100/90 shadow-lg`.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` lulus 100% tanpa error.
+
+---
+
+## Prompt 121
+
+Tanggal: 2026-10-09
+
+Task: Configure Vercel Environment Variable for Gemini AI Chatbot & Update Priority Models
+
+### Prompt Asli
+
+```text
+ini kan saat di deploy ini ai chat bot nya masih belum merespon apakah ada yang harus di settign di envirovment variabel di vercel nya
+```
+
+### Ringkasan Hasil
+
+- **Panduan Konfigurasi Vercel Environment Variable**:
+  - Menjelaskan variabel `NEXT_PUBLIC_GEMINI_API_KEY` wajib didaftarkan pada menu **Settings -> Environment Variables** di Dashboard Vercel.
+  - Menjelaskan bahwa karena Next.js mem-bundle variabel `NEXT_PUBLIC_` saat *build time*, proyek harus di-**Redeploy** setelah menambahkan variabel tersebut.
+- **Pembaruan Model Gemini (`src/services/aiChatService.ts`)**:
+  - Mengubah daftar `PRIORITY_MODELS` ke daftar model resmi Google Gemini yang aktif: `gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-1.5-pro`, `gemini-2.0-flash-lite`, `gemini-1.5-flash-8b`.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.

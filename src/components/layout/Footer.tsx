@@ -16,6 +16,12 @@ import {
 export default function Footer() {
   const pathname = usePathname();
 
+  // Hide Footer when entering lesson/materi pages (e.g. /learn/[topicId])
+  const isMateriPage = pathname ? pathname.startsWith('/learn/') : false;
+  if (isMateriPage) {
+    return null;
+  }
+
   const navigationLinks = [
     { name: 'Home', href: '/', icon: <RiHome5Line className="w-5 h-5" /> },
     { name: 'Learn', href: '/learn', icon: <RiBookOpenLine className="w-5 h-5" /> },

@@ -13,12 +13,13 @@ const API_KEY =
   process.env.VITE_GEMINI_API_KEY ||
   '';
 
-// Priority order for Gemini models (100% active & tested high-capacity models)
+// Priority order for Gemini models (Active & standard Gemini API models)
 const PRIORITY_MODELS = [
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
-  'gemini-3.5-flash-lite',
-  'gemini-3.1-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-pro',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash-8b',
 ];
 
 const SYSTEM_PROMPT = `
