@@ -13,13 +13,12 @@ const API_KEY =
   process.env.VITE_GEMINI_API_KEY ||
   '';
 
-// Priority order for Gemini models (Active & standard Gemini API models)
+// Priority order for Gemini models (100% active & recommended by Google Gemini API in 2026)
 const PRIORITY_MODELS = [
-  'gemini-1.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-pro',
-  'gemini-2.0-flash-lite',
-  'gemini-1.5-flash-8b',
+  'gemini-3.8-flash',
+  'gemini-3.7-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
 ];
 
 const SYSTEM_PROMPT = `
@@ -35,14 +34,16 @@ Aturan Respon (SANGAT KETAT):
 6. RUMUS & LOGIKA MATEMATIKA: Gunakan format LaTeX Math jika menyertakan ekspresi matematika/logika (inline \\( ... \\) atau block \\[ ... \\]).
 `.trim();
 
-let activeModelCache: string | null = null;
+let discoveredModelsCache: string[] | null = null;
 
 /**
  * Dynamic Model Discovery: Fetches active models from Google Gemini API endpoint
- * and selects the highest-priority supported model.
+ * and returns supported active models list sorted by priority.
  */
-export async function discoverBestModel(): Promise<string> {
-  if (activeModelCache) return activeModelCache;
+export async function discoverAvailableModels(): Promise<string[]> {
+  if (discoveredModelsCache && discoveredModelsCache.length > 0) {
+    return discoveredModelsCache;
+  }
 
   try {
     const response = await fetch(
@@ -57,29 +58,21 @@ export async function discoverBestModel(): Promise<string> {
         .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
         .map((m) => m.name.replace('models/', ''));
 
-      for (const priority of PRIORITY_MODELS) {
-        if (availableNames.includes(priority)) {
-          activeModelCache = priority;
-          return priority;
-        }
-      }
+      const matchedPriority = PRIORITY_MODELS.filter((p) => availableNames.includes(p));
+      const otherAvailable = availableNames.filter((a) => !PRIORITY_MODELS.includes(a));
 
-      // If priority models not found, pick any available flash or pro model
-      const fallbackAny = availableNames.find(
-        (n) => n.includes('flash') || n.includes('pro') || n.includes('gemini')
-      );
-      if (fallbackAny) {
-        activeModelCache = fallbackAny;
-        return fallbackAny;
+      const combined = Array.from(new Set([...matchedPriority, ...otherAvailable, ...PRIORITY_MODELS]));
+      if (combined.length > 0) {
+        discoveredModelsCache = combined;
+        return combined;
       }
     }
   } catch (error) {
-    console.warn('OmniBot AI: Model discovery request failed, using default model priority.', error);
+    console.warn('OmniBot AI: Model discovery request failed, using default model priority list.', error);
   }
 
-  // Fallback to first priority model
-  activeModelCache = PRIORITY_MODELS[0];
-  return activeModelCache;
+  discoveredModelsCache = PRIORITY_MODELS;
+  return PRIORITY_MODELS;
 }
 
 /**
@@ -137,9 +130,7 @@ export async function sendMessageToGemini(
   history: ChatMessage[],
   userPrompt: string
 ): Promise<string> {
-  const primaryModel = await discoverBestModel();
-  const candidateModels = Array.from(new Set([primaryModel, ...PRIORITY_MODELS]));
-
+  const candidateModels = await discoverAvailableModels();
   let lastError: any = null;
 
   for (const modelName of candidateModels) {
@@ -161,14 +152,12 @@ export async function sendMessageToGemini(
       const result = await chatSession.sendMessage(userPrompt);
       const responseText = result.response.text();
       if (responseText) {
-        activeModelCache = modelName;
         return responseText;
       }
     } catch (sdkError: any) {
       console.warn(
         `OmniBot AI: SDK call failed for ${modelName} (${sdkError?.message || sdkError}), trying REST API fallback...`
       );
-      activeModelCache = null;
       lastError = sdkError;
     }
 
@@ -176,14 +165,12 @@ export async function sendMessageToGemini(
     try {
       const restResponse = await callGeminiRestApi(modelName, history, userPrompt);
       if (restResponse) {
-        activeModelCache = modelName;
         return restResponse;
       }
     } catch (restError: any) {
       console.warn(
         `OmniBot AI: REST API call failed for model ${modelName} (${restError?.message || restError}). Trying next model...`
       );
-      activeModelCache = null;
       lastError = restError;
     }
   }
