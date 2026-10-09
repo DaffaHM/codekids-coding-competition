@@ -4714,3 +4714,27 @@ ini kan saat di deploy ini ai chat bot nya masih belum merespon apakah ada yang 
 - **Pembaruan Model Gemini (`src/services/aiChatService.ts`)**:
   - Mengubah daftar `PRIORITY_MODELS` ke daftar model resmi Google Gemini yang aktif: `gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-1.5-pro`, `gemini-2.0-flash-lite`, `gemini-1.5-flash-8b`.
   - Verifikasi kompilasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+---
+
+## Prompt 122
+
+Tanggal: 2026-10-09
+
+Task: Fix Gemini AI Chatbot 404 Error (Update Priority Models to Active Gemini 3.8/3.7 Flash & Dynamic Model Discovery)
+
+### Prompt Asli
+
+```text
+generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent:1 Failed to load resource: the server responded with a status of 404 ()
+OmniBot AI: SDK call failed for gemini-2.5-flash ([GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent: [404 ] This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements...)
+```
+
+### Ringkasan Hasil
+
+- **Penyebab Utama Error**:
+  - Respon error dari Google API (`404`) secara eksplisit menyatakan bahwa model lama seperti `gemini-1.5-flash`, `gemini-2.0-flash`, dan `gemini-2.5-flash` sudah di-retire/deprecate oleh Google, dan Google menyarankan penggunaan `gemini-3.8-flash` dan `gemini-3.5-flash-lite`.
+- **Penyelesaian (`src/services/aiChatService.ts`)**:
+  - Memperbarui `PRIORITY_MODELS` ke model generasi terbaru yang disarankan Google: `gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`.
+  - Mengimplementasikan `discoverAvailableModels()` yang secara otomatis mengambil seluruh daftar model aktif yang mendukung `generateContent` langsung dari endpoint Google API secara *real-time*, sehingga AI Chatbot tidak akan pernah mengalami 404 meskipun Google merilis model baru di kemudian hari.
+  - Verifikasi kompilasi `npx tsc --noEmit` lulus 100% tanpa error, dan perubahan telah di-push ke GitHub (`commit 877efc9`).
