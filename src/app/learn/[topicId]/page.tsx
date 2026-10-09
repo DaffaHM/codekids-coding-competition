@@ -65,6 +65,6 @@ export default async function TopicPage({ params }: TopicPageProps) {
     return <Level4LessonReader />;
   }
 
-  // Next levels are reserved for future scope
-  notFound();
+  // Fallback for level-5, level-6, or other topics
+  return <Level4LessonReader />;
 }

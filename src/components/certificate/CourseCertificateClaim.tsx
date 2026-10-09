@@ -23,14 +23,20 @@ export default function CourseCertificateClaim({
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Check if certificate has already been claimed for this course
   useEffect(() => {
+    if (!isMounted) return;
     const existingCert = getCertificateProgress(courseId);
     if (existingCert) {
       setCertData(existingCert);
     }
-  }, [courseId]);
+  }, [courseId, isMounted]);
 
   // Generate native PDF Blob URL when certData is set
   useEffect(() => {
@@ -116,6 +122,10 @@ export default function CourseCertificateClaim({
       setIsDownloading(false);
     }
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6">
