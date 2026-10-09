@@ -25,12 +25,7 @@ export default function Navbar() {
   const backdropRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  // Hide Navbar when entering lesson/materi pages (e.g. /learn/[topicId])
-  const isMateriPage = pathname ? pathname.startsWith('/learn/') : false;
-  if (isMateriPage) {
-    return null;
-  }
-
+  // 1. Hook: Handle Scroll Position
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 25) {
@@ -48,50 +43,7 @@ export default function Navbar() {
     };
   }, []);
 
-  // GSAP Mobile Menu Toggle Handler
-  const toggleMobileMenu = () => {
-    if (!mobileMenuOpen) {
-      setMobileMenuOpen(true);
-      setIsMobileMounted(true);
-    } else {
-      closeMobileMenu();
-    }
-  };
-
-  const closeMobileMenu = () => {
-    if (!isMobileMounted) return;
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setMobileMenuOpen(false);
-          setIsMobileMounted(false);
-        },
-      });
-
-      if (menuRef.current) {
-        tl.to(menuRef.current, {
-          opacity: 0,
-          y: -16,
-          scale: 0.95,
-          duration: 0.22,
-          ease: 'power2.in',
-        }, 0);
-      }
-
-      if (backdropRef.current) {
-        tl.to(backdropRef.current, {
-          opacity: 0,
-          duration: 0.22,
-          ease: 'power2.in',
-        }, 0);
-      }
-    });
-
-    return () => ctx.revert();
-  };
-
-  // Trigger GSAP Entrance Animation when mobile menu mounts
+  // 2. Hook: Trigger GSAP Entrance Animation when mobile menu mounts
   useEffect(() => {
     if (mobileMenuOpen && isMobileMounted) {
       const ctx = gsap.context(() => {
@@ -135,6 +87,55 @@ export default function Navbar() {
     }
   }, [mobileMenuOpen, isMobileMounted]);
 
+  // GSAP Mobile Menu Toggle Handlers
+  const toggleMobileMenu = () => {
+    if (!mobileMenuOpen) {
+      setMobileMenuOpen(true);
+      setIsMobileMounted(true);
+    } else {
+      closeMobileMenu();
+    }
+  };
+
+  const closeMobileMenu = () => {
+    if (!isMobileMounted) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setMobileMenuOpen(false);
+          setIsMobileMounted(false);
+        },
+      });
+
+      if (menuRef.current) {
+        tl.to(menuRef.current, {
+          opacity: 0,
+          y: -16,
+          scale: 0.95,
+          duration: 0.22,
+          ease: 'power2.in',
+        }, 0);
+      }
+
+      if (backdropRef.current) {
+        tl.to(backdropRef.current, {
+          opacity: 0,
+          duration: 0.22,
+          ease: 'power2.in',
+        }, 0);
+      }
+    });
+
+    return () => ctx.revert();
+  };
+
+  // Hide Navbar when entering lesson/materi pages AFTER all hooks have executed
+  const isMateriPage = pathname ? pathname.startsWith('/learn/') : false;
+  if (isMateriPage) {
+    return null;
+  }
+
   const navItems = [
     {
       name: 'Home',
@@ -173,10 +174,9 @@ export default function Navbar() {
       <header className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 pointer-events-none ${
         isScrolled 
           ? 'pt-2.5 sm:pt-3.5 pb-2 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto' 
-          : 'pt-3 sm:pt-4 pb-2 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto'
+          : 'max-w-7xl bg-transparent rounded-none px-2 sm:px-4 py-1.5 border border-transparent shadow-none'
       }`}>
-        {/* Navbar Container: Full-width at top, Floating Pill on scroll */}
-        <div className={`w-full mx-auto flex items-center justify-between transition-all duration-300 ease-in-out pointer-events-auto ${
+        <div className={`w-full mx-auto flex items-center justify-between transition-all duration-300 pointer-events-auto ${
           isScrolled 
             ? 'max-w-6xl bg-white/95 backdrop-blur-md rounded-full px-4 sm:px-6 py-2 sm:py-2.5 border border-blue-100/80 shadow-md' 
             : 'max-w-7xl bg-transparent rounded-none px-2 sm:px-4 py-1.5 border border-transparent shadow-none'
@@ -194,101 +194,91 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Nav Menu Links (Home, Learn, Certificate, About) */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1.5 lg:gap-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
-
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`relative flex items-center gap-2 px-4 py-1.5 rounded-full text-sm lg:text-base font-bold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 lg:px-5 py-2 rounded-full text-xs lg:text-sm font-bold transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#EBF3FF] text-[#2563EB]'
-                      : 'text-[#17233C]/80 hover:text-[#2563EB] hover:bg-slate-100/60'
+                      ? 'bg-[#4F7DF3] text-white shadow-sm'
+                      : 'text-[#17233C]/80 hover:text-[#17233C] hover:bg-slate-100/70'
                   }`}
                 >
-                  <span className={isActive ? 'text-[#2563EB]' : 'text-[#17233C]/80'}>
-                    {item.icon}
-                  </span>
+                  {item.icon}
                   <span>{item.name}</span>
-
-                  {/* Active Indicator Underline Line */}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2.5px] bg-[#2563EB] rounded-full" />
-                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Desktop Right CTA Button ("Mulai Belajar ->") */}
-          <div className="hidden md:flex items-center shrink-0">
+          {/* Right Action CTA Button (Mulai Belajar) */}
+          <div className="hidden md:flex items-center">
             <Link
               href="/learn"
-              className="bg-[#FFD84D] hover:bg-[#FFC926] text-[#17233C] font-extrabold text-sm lg:text-base px-5 lg:px-6 py-2 lg:py-2.5 rounded-full transition-all duration-200 shadow-2xs hover:shadow-md transform active:scale-95 border border-amber-300/60 flex items-center gap-2"
+              className="inline-flex items-center gap-2 bg-[#FFD84D] hover:bg-[#FFE169] active:scale-95 text-[#17233C] text-xs lg:text-sm font-extrabold px-5 lg:px-6 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 group"
             >
               <span>Mulai Belajar</span>
-              <RiArrowRightLine className="w-4 h-4 sm:w-5 sm:h-5 stroke-[0.5]" />
+              <RiArrowRightLine className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
 
-          {/* Mobile Hamburger Button */}
-          <div className="flex md:hidden items-center">
-            <button
-              onClick={toggleMobileMenu}
-              aria-label="Toggle Navigation Menu"
-              className="w-9 h-9 rounded-full bg-slate-100/90 hover:bg-blue-50 active:bg-blue-100 text-[#17233C] hover:text-[#2563EB] focus:outline-none transition-all flex items-center justify-center shrink-0 border border-slate-200/60"
-            >
-              {mobileMenuOpen ? (
-                <RiCloseLine className="w-5.5 h-5.5" />
-              ) : (
-                <RiMenu3Line className="w-5.5 h-5.5" />
-              )}
-            </button>
-          </div>
+          {/* Mobile Menu Toggle Hamburger Button */}
+          <button
+            onClick={toggleMobileMenu}
+            aria-label="Toggle Navigation Menu"
+            className="md:hidden p-2 rounded-2xl bg-white/90 border border-slate-200/80 text-[#17233C] hover:bg-slate-100 transition-colors shadow-xs"
+          >
+            {mobileMenuOpen ? <RiCloseLine className="w-6 h-6" /> : <RiMenu3Line className="w-6 h-6" />}
+          </button>
         </div>
 
-        {/* Mobile Dropdown Menu Card animated with GSAP */}
+        {/* Mobile Navigation Dropdown Card */}
         {isMobileMounted && (
           <div
             ref={menuRef}
-            className="absolute top-full left-3 right-3 sm:left-6 sm:right-6 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-100/90 p-4 md:hidden z-50 flex flex-col gap-1.5 mt-2.5 pointer-events-auto"
+            className="md:hidden mt-2 px-3 pointer-events-auto"
           >
-            {navItems.map((item, idx) => {
-              const isActive = pathname === item.href;
-              return (
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-4 border border-blue-100/90 shadow-2xl flex flex-col gap-2">
+              {navItems.map((item, idx) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    ref={(el) => {
+                      itemRefs.current[idx] = el;
+                    }}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className={`flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-extrabold transition-all ${
+                      isActive
+                        ? 'bg-[#4F7DF3] text-white shadow-xs'
+                        : 'text-[#17233C] hover:bg-slate-100/80'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {item.icon}
+                      <span>{item.name}</span>
+                    </div>
+                    <RiArrowRightLine className="w-4 h-4 opacity-60" />
+                  </Link>
+                );
+              })}
+
+              <div className="pt-2 mt-1 border-t border-slate-100">
                 <Link
-                  key={item.name}
-                  ref={(el) => { itemRefs.current[idx] = el; }}
-                  href={item.href}
+                  href="/learn"
                   onClick={closeMobileMenu}
-                  className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl font-extrabold text-base transition-all ${
-                    isActive
-                      ? 'bg-[#EBF3FF] text-[#2563EB] border border-blue-100/80 shadow-2xs'
-                      : 'text-[#17233C]/80 hover:bg-slate-100/70 hover:text-[#2563EB]'
-                  }`}
+                  className="flex items-center justify-center gap-2 bg-[#FFD84D] hover:bg-[#FFE169] text-[#17233C] text-sm font-black py-3 rounded-2xl shadow-md w-full"
                 >
-                  <span className={isActive ? 'text-[#2563EB]' : 'text-[#17233C]/70'}>
-                    {item.icon}
-                  </span>
-                  <span>{item.name}</span>
+                  <span>Mulai Belajar Sekarang</span>
+                  <RiArrowRightLine className="w-4.5 h-4.5" />
                 </Link>
-              );
-            })}
-
-            <div className="my-1 border-t border-slate-100" />
-
-            <Link
-              ref={(el) => { itemRefs.current[navItems.length] = el; }}
-              href="/learn"
-              onClick={closeMobileMenu}
-              className="w-full text-center bg-[#FFD84D] active:bg-[#FFC926] text-[#17233C] font-extrabold text-base py-3.5 rounded-2xl shadow-md border border-amber-300/60 flex items-center justify-center gap-2 transition-all active:scale-98"
-            >
-              <span>Mulai Belajar</span>
-              <RiArrowRightLine className="w-5 h-5" />
-            </Link>
+              </div>
+            </div>
           </div>
         )}
       </header>

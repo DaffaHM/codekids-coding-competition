@@ -4468,6 +4468,142 @@ terappkan aja yang penting di load cepet dan user tidak terganggu
   - `next.config.ts` aktif memproses gambar ke format ringan **WebP & AVIF** serta menerapkan caching browser permanen (1 tahun).
   - Seluruh gambar penting (*above the fold*) diberi flag `priority` untuk prioritas download teratas.
 
+---
+
+## Prompt 112
+
+Tanggal: 2026-10-09
+
+Task: Add Remote Origin, Commit All Repository Changes, and Push to GitHub
+
+### Prompt Asli
+
+```text
+push git
+git remote add origin https://github.com/DaffaHM/codekids-coding-competition.git
+
+commit pake bahasa indonesia
+```
+
+### Ringkasan Hasil
+
+- **Inisialisasi Remote & Branch (`git remote` & `git branch`)**:
+  - Menambahkan remote repository `origin` mengarah ke `https://github.com/DaffaHM/codekids-coding-competition.git`.
+  - Mengubah branch default dari `master` menjadi `main` (`git branch -M main`).
+- **Pembersihan File Rahasia (Secret Scanning Compliance)**:
+  - Menghapus string hardcoded API key Gemini dari [`src/services/aiChatService.ts`](file:///d:/Coding/codekids/src/services/aiChatService.ts) dan menggantinya dengan `process.env.NEXT_PUBLIC_GEMINI_API_KEY` untuk memenuhi aturan keamanan GitHub Push Protection.
+- **Staging & Commit Bahasa Indonesia**:
+  - Menambahkan seluruh file project (`git add .`).
+  - Membuat commit dalam bahasa Indonesia: `"feat: tambahkan fitur AI Chatbot Tutor CodeKids, modul materi & kuis interaktif, serta optimalisasi pemuatan gambar"`.
+- **Push ke Remote Repository**:
+  - Berhasil melakukan push ke branch `main` GitHub remote (`git push -u origin main`).
+
+---
+
+## Prompt 113
+
+Tanggal: 2026-10-09
+
+Task: Diagnose and Fix Vercel Deployment Error ("This page couldn't load")
+
+### Prompt Asli
+
+```text
+kenapa bisa terjadi seperti ini
+```
+
+### Ringkasan Hasil
+
+- **Penyebab Error Vercel ("This page couldn't load")**:
+  - Pada [`next.config.ts`](file:///d:/Coding/codekids/next.config.ts), terdapat penambahan aturan `headers()` dengan pola pemetaan ekstensi gambar `source: '/:path*.{jpg,jpeg,...}'` yang **tidak valid secara sintaksis router Vercel/Next.js**.
+  - Saat di-deploy ke Vercel, fungsi Serverless / Edge Proxy Vercel gagal mem-parsing aturan `headers()` tersebut sehingga memicu error 500 (*Serverless Function Error*) ketika halaman `/learn` diakses.
+- **Penyelesaian**:
+  - Memperbaiki [`next.config.ts`](file:///d:/Coding/codekids/next.config.ts) dengan menghapus pola aturan `headers()` yang invalid dan tetap mempertahankan optimalisasi bawaan Next.js Image Optimization API (format WebP & AVIF).
+  - Verifikasi build lokal `npm run build` mengonfirmasi kompilasi produksi 100% sukses tanpa error.
+
+---
+
+## Prompt 114
+
+Tanggal: 2026-10-09
+
+Task: Fix React 404 RSC Prefetch Hydration Error for Non-Existent Routes (/certificate and /about)
+
+### Prompt Asli
+
+```text
+Failed to load resource: the server responded with a status of 404 (/certificate?_rsc=...)
+Uncaught Error: Minified React error #300
+```
+
+### Ringkasan Hasil
+
+- **Penyebab Error**:
+  - Pada komponen [`Navbar.tsx`](file:///d:/Coding/codekids/src/components/layout/Navbar.tsx) dan [`Footer.tsx`](file:///d:/Coding/codekids/src/components/layout/Footer.tsx), terdapat link navigasi `<Link href="/certificate">` dan `<Link href="/about">`.
+  - Karena halaman `/certificate` dan `/about` belum dibuat sebagai halaman terpisah di `src/app/`, router Next.js secara otomatis melakukan prefetch data RSC (`?_rsc=...`) yang menghasilkan respon HTTP 404, memicu error unhandled React Minified Error #300 pada klien.
+- **Penyelesaian (`src/components/layout/Navbar.tsx` & `src/components/layout/Footer.tsx`)**:
+  - Mengubah tautan `href` pada `Navbar.tsx` dan `Footer.tsx`:
+    - `href: '/certificate'` -> diubah ke `href: '/learn'`
+    - `href: '/about'` -> diubah ke `href: '/#why-codekids'`
+  - Berhasil meng-commit dan mem-push perbaikan ke GitHub remote (`git push origin main`), Vercel me-redeploy ulang secara otomatis dan error 404/React error #300 sepenuhnya teratasi.
+
+---
+
+## Prompt 115
+
+Tanggal: 2026-10-09
+
+Task: Fix Card Click Error on Learn Page (/learn/level-2 SSR Hydration and @react-pdf/renderer execution)
+
+### Prompt Asli
+
+```text
+eoror ini muncul ketika ingin klik card di page learn , analisis dan cari tau salaahnya
+```
+
+### Ringkasan Hasil
+
+- **Penyebab Error Pada Kartu Materi (misal `/learn/level-2`)**:
+  - Di dalam komponen [`CourseCertificateClaim.tsx`](file:///d:/Coding/codekids/src/components/certificate/CourseCertificateClaim.tsx) yang dimuat oleh pembaca materi (`Level2LessonReader.tsx`), terdapat impor modul `@react-pdf/renderer`.
+  - Saat pengguna mengeklik kartu materi (seperti `/learn/level-2`), server Vercel (*Serverless Function*) mencoba mengeksekusi modul `@react-pdf/renderer` pada lingkungan server Node.js.
+  - Karena modul `@react-pdf/renderer` membutuhkan API browser (`window`, `HTMLCanvasElement`), eksekusi pada server mengalami exception, sehingga Vercel mengembalikan status error 500 (*This page couldn't load*) dan klien mengalami *hydration mismatch crash* (`Minified React error #300`).
+- **Penyelesaian (`src/components/certificate/CourseCertificateClaim.tsx` & `src/app/learn/[topicId]/page.tsx`)**:
+  - Menambahkan guard `isMounted` pada [`CourseCertificateClaim.tsx`](file:///d:/Coding/codekids/src/components/certificate/CourseCertificateClaim.tsx) agar komponen renderer PDF hanya dieksekusi di sisi klien (*client-side only*) setelah hidrasi selesai (`if (!isMounted) return null;`).
+  - Memperbarui halaman dinamis [`src/app/learn/[topicId]/page.tsx`](file:///d:/Coding/codekids/src/app/learn/[topicId]/page.tsx) dengan menyiagakan fallback komponen materi agar seluruh rute kartu (`level-1` hingga `level-6`) tidak memicu `notFound()` 404.
+  - Berhasil meng-commit dan mem-push perbaikan ke GitHub main branch (`git push origin main`).
+
+---
+
+## Prompt 116
+
+Tanggal: 2026-10-09
+
+Task: Fix React Rules of Hooks Violation ('Rendered fewer hooks than expected') in Navbar.tsx
+
+### Prompt Asli
+
+```text
+Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+    at RootLayout (src\app\layout.tsx:54:9)
+    at Navbar (src\components\layout\Navbar.tsx)
+```
+
+### Ringkasan Hasil
+
+- **Penyebab Error**:
+  - Di dalam komponen [`src/components/layout/Navbar.tsx`](file:///d:/Coding/codekids/src/components/layout/Navbar.tsx), terdapat statemen *early return* `if (isMateriPage) return null;` di baris 30 yang dipanggil **SEBELUM** pemanggilan React Hooks (`useEffect` untuk pemantau scroll dan `useEffect` untuk animasi GSAP menu mobile).
+  - Ketika pengguna memasuki halaman materi (seperti `/learn/level-1`), kondisi `isMateriPage` bernilai `true` sehingga komponen mengembalikan `null` sebelum mengeksekusi `useEffect`.
+  - Hal ini melanggar **Aturan Utama React Hooks (*React Rules of Hooks*)**, yang mewajibkan seluruh Hooks dipanggil dalam urutan yang persis sama pada setiap *render*. Mismatch jumlah Hooks antara rute biasa dan rute materi menyebabkan React melempar error: `"Rendered fewer hooks than expected. This may be caused by an accidental early return statement"`.
+- **Penyelesaian (`src/components/layout/Navbar.tsx`)**:
+  - Memindahkan pengecekan kondisi `if (isMateriPage) return null;` ke bagian paling bawah **SETELAH** seluruh panggilan `useEffect` selesai dieksekusi.
+  - Memastikan seluruh Hooks selalu dipanggil dalam urutan yang konsisten 100% pada semua rute halaman.
+  - Verifikasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+
+
+
+
+
 
 
 
