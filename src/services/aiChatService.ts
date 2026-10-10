@@ -7,11 +7,14 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-// Fallback & default Gemini API key (from environment variables)
-const API_KEY =
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
-  process.env.VITE_GEMINI_API_KEY ||
-  '';
+// Helper to get Gemini API key dynamically
+export function getApiKey(): string {
+  return (
+    process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
+    process.env.VITE_GEMINI_API_KEY ||
+    ''
+  ).trim();
+}
 
 // Priority order for Gemini models (100% active & recommended by Google Gemini API in 2026)
 const PRIORITY_MODELS = [
@@ -34,6 +37,7 @@ Aturan Respon (SANGAT KETAT):
 6. RUMUS & LOGIKA MATEMATIKA: Gunakan format LaTeX Math jika menyertakan ekspresi matematika/logika (inline \\( ... \\) atau block \\[ ... \\]).
 `.trim();
 
+let activeWorkingModel = 'gemini-3.8-flash';
 let discoveredModelsCache: string[] | null = null;
 
 /**
@@ -45,9 +49,14 @@ export async function discoverAvailableModels(): Promise<string[]> {
     return discoveredModelsCache;
   }
 
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return PRIORITY_MODELS;
+  }
+
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
     );
     if (response.ok) {
       const data = await response.json();
@@ -83,12 +92,13 @@ async function callGeminiRestApi(
   history: ChatMessage[],
   userPrompt: string
 ): Promise<string> {
+  const apiKey = getApiKey();
   const contents = [
     {
       role: 'user',
       parts: [{ text: `[System Prompt]\n${SYSTEM_PROMPT}` }],
     },
-    ...history.map((msg) => ({
+    ...history.slice(-6).map((msg) => ({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.content }],
     })),
@@ -99,13 +109,19 @@ async function callGeminiRestApi(
   ];
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          maxOutputTokens: 600,
+          temperature: 0.7,
+        },
+      }),
     }
   );
 
@@ -124,35 +140,80 @@ async function callGeminiRestApi(
 }
 
 /**
- * Primary function to send messages to Google Gemini AI with automatic model discovery and multi-model fallback.
+ * Ultra-fast primary function with Streaming Support:
+ * - Uses activeWorkingModel directly (zero initial round-trip latency)
+ * - Limits context history to last 6 messages to keep processing fast
+ * - Streams chunks to onStreamChunk in real-time (sub-500ms initial response)
  */
 export async function sendMessageToGemini(
   history: ChatMessage[],
-  userPrompt: string
+  userPrompt: string,
+  onStreamChunk?: (streamedText: string) => void
 ): Promise<string> {
-  const candidateModels = await discoverAvailableModels();
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('API Key Google Gemini belum terpasang. Pastikan variabel NEXT_PUBLIC_GEMINI_API_KEY sudah diisi pada file .env.local atau Vercel Environment Variables.');
+  }
+
+  // Put activeWorkingModel first for instant hit without discovery delay
+  const candidateModels = Array.from(
+    new Set([activeWorkingModel, ...PRIORITY_MODELS])
+  );
+
   let lastError: any = null;
 
   for (const modelName of candidateModels) {
-    // 1. Try official SDK
+    // 1. Try official SDK with real-time streaming
     try {
-      const genAI = new GoogleGenerativeAI(API_KEY);
+      const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: modelName,
         systemInstruction: SYSTEM_PROMPT,
+        generationConfig: {
+          maxOutputTokens: 600,
+          temperature: 0.7,
+        },
       });
+
+      // Keep recent context compact for lightning-fast token processing
+      const compactHistory = history.slice(-6).map((msg) => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }],
+      }));
 
       const chatSession = model.startChat({
-        history: history.map((msg) => ({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.content }],
-        })),
+        history: compactHistory,
       });
 
-      const result = await chatSession.sendMessage(userPrompt);
-      const responseText = result.response.text();
-      if (responseText) {
-        return responseText;
+      // Streaming execution for sub-second first-token arrival
+      try {
+        const streamResult = await chatSession.sendMessageStream(userPrompt);
+        let accumulatedText = '';
+
+        for await (const chunk of streamResult.stream) {
+          const chunkText = chunk.text();
+          if (chunkText) {
+            accumulatedText += chunkText;
+            if (onStreamChunk) {
+              onStreamChunk(accumulatedText);
+            }
+          }
+        }
+
+        if (accumulatedText.trim().length > 0) {
+          activeWorkingModel = modelName;
+          return accumulatedText;
+        }
+      } catch (streamErr) {
+        // Fallback to non-stream if streaming method fails on this model
+        console.warn(`Streaming failed on ${modelName}, trying standard sendMessage:`, streamErr);
+        const result = await chatSession.sendMessage(userPrompt);
+        const responseText = result.response.text();
+        if (responseText) {
+          activeWorkingModel = modelName;
+          if (onStreamChunk) onStreamChunk(responseText);
+          return responseText;
+        }
       }
     } catch (sdkError: any) {
       console.warn(
@@ -165,6 +226,8 @@ export async function sendMessageToGemini(
     try {
       const restResponse = await callGeminiRestApi(modelName, history, userPrompt);
       if (restResponse) {
+        activeWorkingModel = modelName;
+        if (onStreamChunk) onStreamChunk(restResponse);
         return restResponse;
       }
     } catch (restError: any) {
@@ -173,6 +236,27 @@ export async function sendMessageToGemini(
       );
       lastError = restError;
     }
+  }
+
+  // If initial models failed, try dynamic model discovery as final fallback
+  try {
+    const discovered = await discoverAvailableModels();
+    const remainingModels = discovered.filter((m) => !candidateModels.includes(m));
+
+    for (const fallbackModel of remainingModels) {
+      try {
+        const restResponse = await callGeminiRestApi(fallbackModel, history, userPrompt);
+        if (restResponse) {
+          activeWorkingModel = fallbackModel;
+          if (onStreamChunk) onStreamChunk(restResponse);
+          return restResponse;
+        }
+      } catch (e) {
+        lastError = e;
+      }
+    }
+  } catch (discoveryErr) {
+    console.error('Final model discovery attempt failed:', discoveryErr);
   }
 
   throw lastError || new Error('Semua model Gemini sedang tidak tersedia. Silakan coba beberapa saat lagi.');

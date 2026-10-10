@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import {
   RiCloseLine,
@@ -114,6 +115,9 @@ const TRY_QUESTIONS = [
 ];
 
 export default function AIChatWidget() {
+  const pathname = usePathname();
+  const isLessonPage = pathname ? pathname.startsWith('/learn/') : false;
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_WELCOME_MESSAGE]);
   const [inputMessage, setInputMessage] = useState('');
@@ -134,7 +138,7 @@ export default function AIChatWidget() {
     }
   }, [isOpen, messages, isLoading]);
 
-  // Handle sending message
+  // Handle sending message with real-time streaming
   const handleSendMessage = async (textToSend?: string) => {
     const prompt = (textToSend || inputMessage).trim();
     if (!prompt || isLoading) return;
@@ -146,32 +150,52 @@ export default function AIChatWidget() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const botMsgId = `bot-${Date.now() + 1}`;
+    const initialBotMsg: ChatMessage = {
+      id: botMsgId,
+      role: 'model',
+      content: '',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMsg, initialBotMsg]);
     if (!textToSend) setInputMessage('');
     setIsLoading(true);
 
     try {
       const historyForApi = messages.filter((m) => m.id !== 'welcome-msg');
-      const responseText = await sendMessageToGemini(historyForApi, prompt);
+      const responseText = await sendMessageToGemini(historyForApi, prompt, (streamedText) => {
+        setIsLoading(false);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMsgId ? { ...msg, content: streamedText } : msg
+          )
+        );
+      });
 
-      const botMsg: ChatMessage = {
-        id: `bot-${Date.now()}`,
-        role: 'model',
-        content: responseText,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, botMsg]);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botMsgId ? { ...msg, content: responseText } : msg
+        )
+      );
     } catch (error: any) {
       console.error('CodeKids AI Chat Error:', error);
+      const isApiKeyMissing =
+        error?.message?.includes('API Key') ||
+        error?.message?.includes('unregistered callers') ||
+        error?.message?.includes('API_KEY');
+
       const errorMsg: ChatMessage = {
-        id: `err-${Date.now()}`,
+        id: botMsgId,
         role: 'model',
-        content:
-          '⚠️ **Maaf, terjadi kendala saat terhubung ke AI Tutor.**\n\nSilakan periksa koneksi internet kamu atau coba beberapa saat lagi.',
+        content: isApiKeyMissing
+          ? '⚠️ **Google Gemini API Key belum terpasang.**\n\nPastikan variabel `NEXT_PUBLIC_GEMINI_API_KEY` sudah diisi di file `.env.local` (untuk lokal) atau di **Settings ➔ Environment Variables** (untuk Vercel).'
+          : '⚠️ **Maaf, terjadi kendala saat terhubung ke AI Tutor.**\n\nSilakan periksa koneksi internet kamu atau coba beberapa saat lagi.',
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === botMsgId ? errorMsg : msg))
+      );
     } finally {
       setIsLoading(false);
     }
@@ -191,7 +215,15 @@ export default function AIChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 font-sans select-none">
+    <div
+      className={`fixed z-50 font-sans select-none transition-all duration-300 ${
+        isOpen
+          ? 'bottom-4 right-4 sm:bottom-6 sm:right-6'
+          : isLessonPage
+          ? 'bottom-20 sm:bottom-24 right-3 sm:right-6'
+          : 'bottom-4 sm:bottom-6 right-3 sm:right-6'
+      }`}
+    >
       {/* ================================================== */}
       {/* FLOATING TRIGGER MASCOT BUTTON                     */}
       {/* ================================================== */}
@@ -199,7 +231,7 @@ export default function AIChatWidget() {
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Tanya CodeKids AI Tutor"
-          className="group relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer drop-shadow-xl hover:drop-shadow-2xl"
+          className="group relative flex items-center justify-center w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer drop-shadow-xl hover:drop-shadow-2xl"
         >
           {/* Lottie 3D Mascot */}
           <div className="w-full h-full relative z-10 pointer-events-none">
@@ -368,6 +400,9 @@ export default function AIChatWidget() {
             {/* Conversation History */}
             {messages.slice(1).map((msg) => {
               const isUser = msg.role === 'user';
+              if (!isUser && !msg.content.trim()) {
+                return null;
+              }
 
               return (
                 <div

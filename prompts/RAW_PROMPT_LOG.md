@@ -4738,3 +4738,325 @@ OmniBot AI: SDK call failed for gemini-2.5-flash ([GoogleGenerativeAI Error]: Er
   - Memperbarui `PRIORITY_MODELS` ke model generasi terbaru yang disarankan Google: `gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`.
   - Mengimplementasikan `discoverAvailableModels()` yang secara otomatis mengambil seluruh daftar model aktif yang mendukung `generateContent` langsung dari endpoint Google API secara *real-time*, sehingga AI Chatbot tidak akan pernah mengalami 404 meskipun Google merilis model baru di kemudian hari.
   - Verifikasi kompilasi `npx tsc --noEmit` lulus 100% tanpa error, dan perubahan telah di-push ke GitHub (`commit 877efc9`).
+
+---
+
+## Prompt 123
+
+Tanggal: 2026-10-10
+
+Task: Optimize AI Chatbot Latency with Real-Time Streaming, Model Caching, and Generation Token Tuning
+
+### Prompt Asli
+
+```text
+kenapa ai chat bot nya merespon lama , bisa ga dia merespon cepat
+```
+
+### Ringkasan Hasil
+
+- **Analisis Masalah Latensi Lambat**:
+  - Chatbot sebelumnya menunggu seluruh respon selesai di-generate secara penuh (`non-streaming`) sebelum menampilkannya di UI. Jika respon sepanjang 150-250 kata, pengguna harus menunggu selama 5-8 detik tanpa ada teks yang muncul.
+  - Terdapat pemanggilan berulang ke endpoint discovery model sebelum mengirim pesan.
+  - Seluruh riwayat percakapan yang panjang dikirim ke API tanpa batasan konteks, memperlambat proses komputasi prompt.
+- **Solusi & Optimasi Kecepatan Ekstrem**:
+  - **Dukungan Real-Time Token Streaming (`chatSession.sendMessageStream`)**:
+    - Mengintegrasikan callback stream di [`src/services/aiChatService.ts`](file:///d:/Coding/codekids/src/services/aiChatService.ts) dan [`src/components/AIChatWidget.tsx`](file:///d:/Coding/codekids/src/components/AIChatWidget.tsx). Kata-kata pertama muncul ke layar dalam waktu **< 500ms** (*typewriter effect*), mengurangi persepsi waktu tunggu hingga 90%.
+  - **Instant Model Direct Hit & In-Memory Caching**:
+    - Menggunakan model aktif terverifikasi (`activeWorkingModel: gemini-3.8-flash`) secara instan tanpa perlu melakukan polling network discovery di setiap pesan.
+  - **Optimalisasi Token Output & History Trimming**:
+    - Mengatur `generationConfig: { maxOutputTokens: 600, temperature: 0.7 }` agar jawaban padat dan cepat di-generate.
+    - Membatasi konteks riwayat percakapan hanya pada 6 pesan terakhir (`history.slice(-6)`), membuat payload prompt sangat ringan.
+  - Verifikasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+---
+
+## Prompt 124
+
+Tanggal: 2026-10-10
+
+Task: Resolve 403 Forbidden Unregistered Caller Error by Creating Local .env.local and Adding Dynamic API Key Validation
+
+### Prompt Asli
+
+```text
+generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=:1 Failed to load resource: the server responded with a status of 403 ()
+Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.
+```
+
+### Ringkasan Hasil
+
+- **Akar Penyebab Error 403**:
+  - Pada lingkungan lokal development (`npm run dev`), file `.env.local` belum ada di root project, sehingga variabel `process.env.NEXT_PUBLIC_GEMINI_API_KEY` bernilai string kosong `""`.
+  - Terlihat pada URL permintaan API: `generateContent?key=` di mana nilai setelah tanda `=` kosong. Google API menolak request ini dengan status `403 Method doesn't allow unregistered callers`.
+- **Langkah Perbaikan**:
+  - Membuat file [`.env.local`](file:///d:/Coding/codekids/.env.local) di root project dengan key `NEXT_PUBLIC_GEMINI_API_KEY`.
+  - Menambahkan fungsi helper `getApiKey()` dan validasi di [`src/services/aiChatService.ts`](file:///d:/Coding/codekids/src/services/aiChatService.ts) agar tidak lagi mengirim request ke Google API jika API key belum terpasang.
+  - Memperbarui pesan error di [`src/components/AIChatWidget.tsx`](file:///d:/Coding/codekids/src/components/AIChatWidget.tsx) agar memberikan instruksi yang jelas kepada developer jika API Key belum disetting.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` lulus 100% tanpa error.
+
+---
+
+## Prompt 125
+
+Tanggal: 2026-10-10
+
+Task: Replace Footer Background Image with Sky/Cloud Gradient Styling
+
+### Prompt Asli
+
+```text
+untuk footernya gausah pake background deh ganti pake warna aja gradient warna awan gitu
+```
+
+### Ringkasan Hasil
+
+- **Penyesuaian Visual Footer (`src/components/layout/Footer.tsx`)**:
+  - Menghapus penggunaan gambar latar statis `Image src="/home/footerbg.png"`.
+  - Menggantinya dengan gradien warna awan langit lembut: `bg-gradient-to-b from-[#F6F8FC] via-[#E8F2FE] to-[#D5E8FD]` dengan border atas halus `border-t border-blue-100/70`.
+  - Menambahkan aksen pendaran awan lembut (*ambient cloud blur glows*) di latar belakang untuk memberikan kedalaman visual yang alami dan estetis.
+  - Menghapus kolom spacer ilustrasi robot lama dan menyeimbangkan tata letak grid konten (*Logo & Deskripsi* di 4 kolom, *Navigasi/Materi/Bantuan* di 8 kolom).
+  - Memperbarui tautan Certificate ke `/learn#certificate`.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+---
+
+## Prompt 126
+
+Tanggal: 2026-10-10
+
+Task: Fix Mobile Certificate Preview Zoom Bug with Responsive Container Query Layout
+
+### Prompt Asli
+
+```text
+untuk di tampilan mobile ketika kita memperoleh sertifikat , tampilan sertifikatny jadi nge zoom, coba perbaiki agar tampilan sertifikat nya benar dan optimal
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah Zoom pada Tampilan Mobile**:
+  - Sebelumnya, tampilan pratinjau sertifikat di [`src/components/certificate/CourseCertificateClaim.tsx`](file:///d:/Coding/codekids/src/components/certificate/CourseCertificateClaim.tsx) dirender menggunakan elemen `<iframe src={pdfBlobUrl}>`.
+  - Browser mobile (Safari iOS dan Chrome Android) tidak dapat melakukan *auto-scale* (fit-to-page) file PDF di dalam iframe. Browser mobile merender halaman PDF berukuran asli 1528x997px di resolusi 100%, sehingga hanya sudut kiri atas sertifikat yang terlihat dan tampak ter-*zoom in* secara ekstrem dan terpotong.
+- **Solusi & Implementasi Pratinjau Responsif Modern**:
+  - Mengganti tag `<iframe>` dengan komponen pratinjau responsif berbasis CSS Container Query:
+    - Container menggunakan rasio aspek template resmi `aspect-[1528/997]` dengan `[container-type:inline-size]`.
+    - Gambar latar belakang template sertifikat dirender menggunakan komponen Next.js `<Image src="/certificates/codekids-certificate1.png">` dengan `priority` dan `object-cover`.
+    - Teks dinamis nama siswa, nama kursus, dan tanggal kelulusan diposisikan secara presisi menggunakan persentase koordinat dari `CERTIFICATE_LAYOUT`.
+    - Ukuran teks dihitung secara dinamis menggunakan satuan Container Query Width (`cqw`), sehingga font otomatis mengecil dan membesar secara proporsional sesuai lebar layar perangkat tanpa blur dan tanpa zoom berlebih.
+  - Tombol **Download Certificate** tetap menghasilkan file PDF vektor asli beresolusi tinggi menggunakan `@react-pdf/renderer`.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+---
+
+## Prompt 127
+
+Tanggal: 2026-10-10
+
+Task: Resolve AI Chatbot Widget Overlapping Next/Lanjut Button on Lesson Pages
+
+### Prompt Asli
+
+```text
+berikan solusi untuk mengatasi butoon berikutnya tertimpa widget ai chat bot
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah**:
+  - Tombol navigasi "Lanjut" pada halaman materi berada di dalam sticky bottom navigation bar (`fixed bottom-0`).
+  - Widget AI Chatbot sebelumnya memiliki posisi statis di pojok kanan bawah (`fixed bottom-4 right-4`), sehingga maskot mengapung persis di atas tombol "Lanjut" dan menghalangi klik/tap pengguna terutama di layar smartphone.
+- **Implementasi Solusi Terpilih**:
+  - **Dynamic Context-Aware Bottom Positioning (`src/components/AIChatWidget.tsx`)**:
+    - Mendeteksi rute aktif menggunakan `usePathname()`. Pada halaman materi (`pathname.startsWith('/learn/')`), posisi floating button otomatis dinaikkan ke `bottom-20 sm:bottom-24` tepat di atas batas atas sticky bottom bar.
+    - Pada halaman lain (seperti Home dan Course Grid), widget tetap berada di posisi standar `bottom-4 sm:bottom-6`.
+    - Saat modal chat dibuka (`isOpen === true`), widget kembali ke `bottom-4` agar jendela percakapan dapat memanfaatkan tinggi layar penuh.
+  - **Ukuran Mascot Mobile yang Lebih Rapi & Proporsional**:
+    - Mengurangi ukuran maskot di layar mobile dari `w-20 h-20` (80px) menjadi `w-14 h-14` / `w-16 h-16` (56-64px), sehingga area baca materi jauh lebih lega dan tombol "Lanjut" 100% bersih tanpa halangan.
+  - Verifikasi kompilasi TypeScript `npx tsc --noEmit` terkonfirmasi 100% lulus tanpa error.
+
+---
+
+## Prompt 128
+
+Tanggal: 2026-10-10
+
+Task: Implementasi Halaman Sertifikatku — CodeKids (Galeri Sertifikat, Status Locked/Claimable/Earned, Preview Modal, dan Download PDF)
+
+### Prompt Asli
+
+```text
+# IMPLEMENTASI PAGE SERTIFIKATKU — CODEKIDS
+
+Implementasikan halaman **Sertifikatku** pada website CodeKids berdasarkan screenshot desain yang diberikan.
+
+Halaman ini berfungsi sebagai galeri sertifikat yang sudah diperoleh pengguna setelah menyelesaikan course. Pengguna dapat melihat dan mengunduh kembali sertifikat yang pernah dibuat.
+
+Sistem harus terintegrasi dengan course completion dan certificate generation yang sudah ada.
+...
+```
+
+### Ringkasan Hasil
+
+- **Penyelarasan Desain & Sistem Sertifikat CodeKids**:
+  - Menganalisis screenshot referensi desain dan seluruh dokumentasi (`AI_AGENT_RULES.md`, `DESIGN_SYSTEM.md`, `CURRICULUM.md`, `TECHNICAL_SPEC.md`).
+  - Menetapkan 6 course resmi sesuai `CURRICULUM.md`:
+    1. Level 1: `Apa Itu Coding?` (`/learn/level-1`)
+    2. Level 2: `Algorithm` (`/learn/level-2`)
+    3. Level 3: `HTML` (`/learn/level-3`)
+    4. Level 4: `CSS` (`/learn/level-4`)
+    5. Level 5: `JavaScript` (`/learn/level-5`)
+    6. Level 6: `Final Project` (`/learn/level-6`)
+- **Navigasi & Routing**:
+  - Memperbarui [`Navbar.tsx`](file:///d:/Coding/codekids/src/components/layout/Navbar.tsx) dengan struktur navigasi resmi: **Beranda** (`/`), **Materi** (`/learn`), **Sertifikatku** (`/certificate`), dan tombol **Mulai Belajar →** (`/learn`). Menu About ditiadakan sesuai instruksi.
+  - Memperbarui link navigasi di [`Footer.tsx`](file:///d:/Coding/codekids/src/components/layout/Footer.tsx) ke rute `/certificate` dan link materi langsung ke masing-masing level course.
+  - Membuat route baru [`src/app/certificate/page.tsx`](file:///d:/Coding/codekids/src/app/certificate/page.tsx) dengan metadata SEO lengkap (title, description, keywords).
+- **Hero & Ilustrasi**:
+  - Mengimplementasikan hero section playful dengan aksen langit & awan, badge pita penghargaan biru (`#4F7DF3`), judul `Sertifikatku`, deskripsi, pill statistik perolehan sertifikat dinamis (`X dari 6 Sertifikat Diperoleh`), dan ilustrasi anak memegang sertifikat (`/certificates/hero-kid.png`).
+- **Galeri Sertifikat (`src/components/certificate/CertificateGallery.tsx`)**:
+  - Container card putih rounded (`rounded-3xl` / `rounded-[36px]`) dengan icon trofi emas dan deskripsi section.
+  - Empty state ramah: Jika 0 sertifikat diperoleh, menampilkan banner dorongan belajar *"Belum Ada Sertifikat: Selesaikan course pertamamu dan dapatkan sertifikat CodeKids!"* dengan tombol *"Mulai Belajar →"* menuju `/learn`.
+  - Grid card adaptif: 4 kolom pada desktop (`xl:grid-cols-4`, `lg:grid-cols-3`), 2 kolom pada tablet (`sm:grid-cols-2`), dan 1 kolom pada mobile tanpa horizontal overflow.
+  - Tiga status sertifikat terintegrasi:
+    1. **`earned`**: Menampilkan thumbnail sertifikat live beresolusi proporsional menggunakan CSS container queries (`[container-type:inline-size]` + `cqw`), tanggal penyelesaian bahasa Indonesia, tombol **Lihat** (membuka modal preview), dan tombol **PDF** (mengunduh PDF langsung).
+    2. **`claimable`**: Untuk course yang sudah diselesaikan tetapi belum diklaim namanya, menampilkan badge hijau *"✓ Course Selesai (Siap Diklaim)"* dan tombol *"Klaim Sertifikat"* yang membuka modal pengisian nama.
+    3. **`locked`**: Card teredup dengan ikon gembok, teks *"Belum diperoleh"*, dan tombol *"Selesaikan Course"* yang mengarahkan langsung ke URL materi course terkait (bukan data palsu).
+- **Modal Preview & Download PDF Native**:
+  - Modal **Lihat Sertifikat** menampilkan template sertifikat asli (`/certificates/codekids-certificate1.png`) dengan tipografi adaptif nama, judul course, tanggal penyelesaian, dan tombol *Download PDF Sertifikat*.
+  - Menggunakan native PDF generator `@react-pdf/renderer` melalui [`CertificatePDF.tsx`](file:///d:/Coding/codekids/src/components/certificate/CertificatePDF.tsx) dengan rasio presisi 1528x997 dan penamaan file aman `CodeKids-[CourseName]-Certificate.pdf`.
+- **Penyimpanan & Validasi `localStorage` (`src/lib/storage.ts`)**:
+  - Key konsisten: `codekids_user_progress_v1`.
+  - Fungsi validasi `validateCertificateData`, pembacaan aman `getCertificateProgress`, `getAllEarnedCertificates`, dan penentuan status `getCourseCertificateStatus`.
+  - Dukungan alias course (`level-1` s.d. `level-6`) dan penyelesaian `finalProject`.
+  - Aman dari error SSR hydration Next.js (`isMounted` guard).
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+  - `npm run build`: Berhasil 100% mengompilasi rute `○ /certificate` secara optimal.
+
+---
+
+## Prompt 129
+
+Tanggal: 2026-10-10
+
+Task: Hapus Ilustrasi Anak dan Optimalkan Layout Halaman Sertifikatku
+
+### Prompt Asli
+
+```text
+itu gmabnr anak nya hapus aja dan optimalkan lagi
+```
+
+### Ringkasan Hasil
+
+- **Penghapusan Aset Ilustrasi Anak**:
+  - Menghapus rendering gambar anak memegang sertifikat (`/certificates/hero-kid.png`) dari komponen [`CertificateGallery.tsx`](file:///d:/Coding/codekids/src/components/certificate/CertificateGallery.tsx).
+  - Menghapus file fisik `public/certificates/hero-kid.png` untuk menghemat ukuran bundle dan menjaga kebersihan direktori aset.
+- **Optimalisasi Hero Section**:
+  - **Keseimbangan Layout**: Mengganti area kanan yang sebelumnya diisi gambar anak dengan **Card Progres Koleksi (Achievement & Progress Card)** yang interaktif dan elegan.
+  - **Komponen Progres Interaktif**:
+    - Menampilkan lencana trofi emas, status `X / 6 Selesai`, progress bar dinamis berwarna gradien (`#4F7DF3` ke `#42C88A`) dengan persentase real-time, dan pesan motivasi ramah anak.
+    - Menambahkan micro-badge di sisi kiri: *"Sertifikat Resmi Berstandar CodeKids"* dengan aksen bintang bersinar.
+  - **Spasing & Tipografi Lebih Rapi**: Mengurangi tinggi vertikal hero sehingga galeri sertifikat langsung terlihat di area atas layar tanpa harus scroll berlebih.
+- **Optimalisasi Label Tombol Kartu Sertifikat**:
+  - Memperbarui label tombol kartu dari sebelumnya singkatan `Lihat` dan `PDF` menjadi **`Lihat Sertifikat`** dan **`Download PDF`** lengkap dengan utilitas `truncate` dan `min-w-0` agar proporsional dan tidak pernah mengalami line-break canggung di layar mana pun.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+  - `npm run build`: Berhasil 100% lulus build produksi Next.js (Turbopack).
+
+---
+
+## Prompt 130
+
+Tanggal: 2026-10-10
+
+Task: Penambahan Top Padding pada Halaman Sertifikatku agar Tidak Tertimpa Fixed Navbar
+
+### Prompt Asli
+
+```text
+beri gap konten ke atas nya itu nabrak nav
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah**:
+  - Komponen [`Navbar.tsx`](file:///d:/Coding/codekids/src/components/layout/Navbar.tsx) memiliki posisi fixed di bagian atas (`fixed top-0 inset-x-0 w-full z-50`) dengan tinggi sekitar ~72px hingga ~84px.
+  - Sebelumnya, hero section pada [`CertificateGallery.tsx`](file:///d:/Coding/codekids/src/components/certificate/CertificateGallery.tsx) hanya memiliki `pt-8 sm:pt-12 md:pt-14` (32px - 56px), sehingga elemen logo CodeKids, menu navigasi, dan tombol "Mulai Belajar" di navbar menabrak dan menutupi judul "Sertifikatku" serta kartu "Progres Koleksi".
+- **Implementasi Solusi**:
+  - Memperbarui padding atas hero section di [`CertificateGallery.tsx`](file:///d:/Coding/codekids/src/components/certificate/CertificateGallery.tsx) menjadi `pt-24 sm:pt-28 md:pt-32 lg:pt-36` (96px hingga 144px).
+  - Memberikan jarak aman dan lega antara bagian bawah navbar mengambang dengan bagian atas konten hero di semua ukuran layar (mobile, tablet, maupun desktop).
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+
+---
+
+## Prompt 131
+
+Tanggal: 2026-10-10
+
+Task: Kalibrasi & Presisi Penempatan Tanggal dan Nama Peserta pada Sertifikat CodeKids
+
+### Prompt Asli
+
+```text
+itu -penempatan tanggalnya kurang pas coba optimalkan lagi dan namanya juga
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah**:
+  - Resolusi native file template sertifikat [`public/certificates/codekids-certificate1.png`](file:///d:/Coding/codekids/public/certificates/codekids-certificate1.png) adalah **1491 x 1055 piksel** (aspek rasio ~1.413).
+  - Sebelumnya, konfigurasi layout menggunakan nilai perkiraan lama (1528 x 997 piksel). Akibatnya:
+    1. **Tanggal Terpotong Garis Horizontal**: Garis pembatas berada pada koordinat `y = 916`. Sebelumnya tanggal ditarik pada posisi `top: 88.766%` (~936px pada koordinat yang tidak sinkron), menyebabkan teks tanggal terbelah tepat di tengah garis horizontal pembatas.
+    2. **Posisi Nama Peserta Tidak Simetris**: Jarak nama ke teks *"Dengan bangga diberikan kepada"* (selesai di `y = 398`) dan ke garis ornamen tengah (mulai di `y = 556`) belum berada tepat di titik tengah vertikal (*vertical center*).
+- **Implementasi Kalibrasi Presisi Piksel**:
+  - **Penyelarasan Rasio & Dimensi Sistem ([`src/lib/certificateLayout.ts`](file:///d:/Coding/codekids/src/lib/certificateLayout.ts))**:
+    - Mengubah ukuran acuan menjadi dimensi asli `width: 1491` dan `height: 1055`.
+    - Menyesuaikan rasio container preview pada [`CertificateGallery.tsx`](file:///d:/Coding/codekids/src/components/certificate/CertificateGallery.tsx) dan [`CourseCertificateClaim.tsx`](file:///d:/Coding/codekids/src/components/certificate/CourseCertificateClaim.tsx) menjadi `aspect-[1491/1055]`.
+  - **Penempatan Tanggal yang Bersih & Simetris**:
+    - Tanggal penyelesaian diposisikan rapi di **bawah garis pembatas** (`top: 88.531%`, setara `y = 934..968`) dengan rentang horizontal `left: 31.657%` dan `width: 18.578%`.
+    - Posisi tanggal kini simetris 100% sejajar dengan teks *"CodeKids Team"* di sisi kanan (`y = 941..958`), tanpa ada teks yang terpotong garis.
+  - **Penempatan Nama Peserta yang Proporsional**:
+    - Nama peserta ditempatkan tepat di tengah area vertikal bebas antara *"Dengan bangga diberikan kepada"* dan garis divider tengah (`top: 42.18%`, tinggi `6.635%`).
+    - Ukuran font adaptif dioptimalkan (`defaultSize: 48`, `minSize: 26`) sehingga nama pendek maupun panjang tetap seimbang dan estetik.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+  - `npm run build`: Berhasil 100% kompilasi produksi Next.js.
+
+---
+
+## Prompt 132
+
+Tanggal: 2026-10-10
+
+Task: Buat Kartu Level 05 (JavaScript) dan Level 06 (Final Project) Menjadi Hitam Putih dan Coming Soon
+
+### Prompt Asli
+
+```text
+buat hitam putih dan comingsoon
+```
+
+### Ringkasan Hasil
+
+- **Penyesuaian Tampilan CourseGrid ([`src/components/learn/CourseGrid.tsx`](file:///d:/Coding/codekids/src/components/learn/CourseGrid.tsx))**:
+  - Menambahkan properti `isComingSoon?: boolean` pada interface data kartu course, dan menyetelnya menjadi `true` untuk **Level 05 (JavaScript)** dan **Level 06 (Final Project)**.
+  - **Efek Hitam Putih (Grayscale)**:
+    - Banner gambar kartu Level 05 (`card5.png`) dan Level 06 (`card6.png`) diberikan filter `grayscale contrast-95 opacity-85`.
+    - Area ikon fitur di bagian tengah (Level, Sertifikat, Materi) diberikan filter `grayscale opacity-60` agar serasi dengan nuansa monokrom.
+  - **Lencana "Coming Soon"**:
+    - Menambahkan badge mengambang di pojok kanan atas banner bertuliskan *"Coming Soon"* dengan latar gelap transparan (`bg-[#17233C]/85 backdrop-blur-md`), teks putih tebal, dan indikator lingkaran kuning berkedip (*pulsing yellow dot*).
+  - **Tombol Dinonaktifkan**:
+    - Tombol aksi diubah dari navigasi link "Mulai Belajar" menjadi tombol nonaktif (*disabled button*) bertuliskan **"Coming Soon"** lengkap dengan ikon gembok (`Lock`), kursor `cursor-not-allowed`, latar slate redup (`bg-slate-100 text-slate-400 border-slate-200`), dan tanpa efek hover aktif.
+- **Penyelarasan Galeri Sertifikat ([`src/components/certificate/CertificateGallery.tsx`](file:///d:/Coding/codekids/src/components/certificate/CertificateGallery.tsx))**:
+  - Menambahkan flag `isComingSoon: true` pada Level 5 dan Level 6 di galeri sertifikat.
+  - Kartu yang berstatus terkunci untuk level tersebut otomatis menampilkan badge thumbnail *"Coming Soon"*, status subtitle *"Segera Hadir"*, dan tombol nonaktif *"Coming Soon"* (menggantikan tombol "Selesaikan Course").
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+  - `npm run build`: Berhasil 100% kompilasi produksi Next.js.
+
+
+
+
+

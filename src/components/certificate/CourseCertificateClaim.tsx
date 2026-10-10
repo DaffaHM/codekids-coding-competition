@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Award, Download, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import { CertificatePDF } from './CertificatePDF';
-import { getSanitizedFilename } from '@/lib/certificateLayout';
+import { CERTIFICATE_LAYOUT, calculateAdaptiveFontSize, getSanitizedFilename } from '@/lib/certificateLayout';
 import { getCertificateProgress, saveCertificateClaim } from '@/lib/storage';
 import { CertificateData } from '@/types/progress';
 
@@ -215,22 +216,65 @@ export default function CourseCertificateClaim({
             </p>
           </div>
 
-          {/* Native PDF Certificate Preview (Exact 1:1 Parity with PDF File) */}
-          <div className="relative w-full max-w-3xl mx-auto rounded-3xl overflow-hidden border-4 border-[#17233C] shadow-2xl bg-white aspect-[1.532/1]">
-            {pdfUrl ? (
-              <iframe
-                src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                title="CodeKids Certificate PDF Preview"
-                className="w-full h-full border-0 select-none"
-              />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 p-6 space-y-3">
-                <Loader2 className="w-10 h-10 text-[#4F7DF3] animate-spin" />
-                <p className="text-sm font-extrabold text-[#17233C]">
-                  Membuat Sertifikat PDF Native...
-                </p>
-              </div>
-            )}
+          {/* Responsive Certificate Preview (Pixel-perfect on Mobile & Desktop, No Iframe Zoom Bug) */}
+          <div className="relative w-full max-w-3xl mx-auto rounded-2xl sm:rounded-3xl overflow-hidden border-2 sm:border-4 border-[#17233C] shadow-2xl bg-white aspect-[1491/1055] [container-type:inline-size] select-none">
+            {/* Background Certificate Template Image */}
+            <Image
+              src={CERTIFICATE_LAYOUT.templateUrl}
+              alt="CodeKids Certificate Template"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 800px"
+              className="object-cover pointer-events-none"
+            />
+
+            {/* Dynamic Student Name */}
+            <div
+              className="absolute flex items-center justify-center text-center font-black pointer-events-none font-sans"
+              style={{
+                top: '42.18%',
+                left: '0%',
+                width: '100%',
+                height: '6.635%',
+                color: CERTIFICATE_LAYOUT.name.color,
+                fontSize: `${(calculateAdaptiveFontSize(certData.studentName, CERTIFICATE_LAYOUT.name.defaultFontSize, CERTIFICATE_LAYOUT.name.minFontSize, 18) / 1491) * 100}cqw`,
+                lineHeight: 1.1,
+              }}
+            >
+              <span className="truncate px-4">{certData.studentName}</span>
+            </div>
+
+            {/* Dynamic Course Name */}
+            <div
+              className="absolute flex items-center justify-center text-center font-extrabold pointer-events-none font-sans"
+              style={{
+                top: '63.697%',
+                left: '0%',
+                width: '100%',
+                height: '5.213%',
+                color: CERTIFICATE_LAYOUT.course.color,
+                fontSize: `${(calculateAdaptiveFontSize(certData.courseName, CERTIFICATE_LAYOUT.course.defaultFontSize, CERTIFICATE_LAYOUT.course.minFontSize, 25) / 1491) * 100}cqw`,
+                lineHeight: 1.1,
+              }}
+            >
+              <span className="truncate px-4">{certData.courseName}</span>
+            </div>
+
+            {/* Dynamic Completion Date (Cleanly positioned below the line) */}
+            <div
+              className="absolute flex items-center justify-center text-center font-bold pointer-events-none font-sans"
+              style={{
+                top: '88.531%',
+                left: '31.657%',
+                width: '18.578%',
+                height: '3.223%',
+                color: CERTIFICATE_LAYOUT.date.color,
+                fontSize: `${(CERTIFICATE_LAYOUT.date.fontSize / 1491) * 100}cqw`,
+                lineHeight: 1.1,
+              }}
+            >
+              <span>{certData.completionDate}</span>
+            </div>
           </div>
 
           {/* Action Button: Download Certificate Only */}

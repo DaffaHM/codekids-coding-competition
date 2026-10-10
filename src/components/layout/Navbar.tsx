@@ -138,24 +138,19 @@ export default function Navbar() {
 
   const navItems = [
     {
-      name: 'Home',
+      name: 'Beranda',
       href: '/',
       icon: <RiHome5Line className="w-4.5 h-4.5 stroke-[0.3]" />,
     },
     {
-      name: 'Learn',
+      name: 'Materi',
       href: '/learn',
       icon: <RiBookOpenLine className="w-4.5 h-4.5 stroke-[0.3]" />,
     },
     {
-      name: 'Certificate',
-      href: '/learn#certificate',
+      name: 'Sertifikatku',
+      href: '/certificate',
       icon: <RiAwardLine className="w-4.5 h-4.5 stroke-[0.3]" />,
-    },
-    {
-      name: 'About',
-      href: '/#why-codekids',
-      icon: <RiLightbulbLine className="w-4.5 h-4.5 stroke-[0.3]" />,
     },
   ];
 

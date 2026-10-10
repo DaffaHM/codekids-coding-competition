@@ -6,6 +6,7 @@ export interface CertificateData {
   courseId: string;
   courseName: string;
   completionDate: string;
+  certificateVersion?: number;
 }
 
 export interface TopicProgress {

@@ -23,19 +23,18 @@ export default function Footer() {
   }
 
   const navigationLinks = [
-    { name: 'Home', href: '/', icon: <RiHome5Line className="w-5 h-5" /> },
-    { name: 'Learn', href: '/learn', icon: <RiBookOpenLine className="w-5 h-5" /> },
-    { name: 'Certificate', href: '/learn', icon: <RiAwardLine className="w-5 h-5" /> },
-    { name: 'About', href: '/#why-codekids', icon: <RiLightbulbLine className="w-5 h-5" /> },
+    { name: 'Beranda', href: '/', icon: <RiHome5Line className="w-5 h-5" /> },
+    { name: 'Materi', href: '/learn', icon: <RiBookOpenLine className="w-5 h-5" /> },
+    { name: 'Sertifikatku', href: '/certificate', icon: <RiAwardLine className="w-5 h-5" /> },
   ];
 
   const materiLinks = [
-    { name: 'Apa Itu Coding', href: '/learn' },
-    { name: 'Algorithm', href: '/learn' },
-    { name: 'HTML', href: '/learn' },
-    { name: 'CSS', href: '/learn' },
-    { name: 'JavaScript', href: '/learn' },
-    { name: 'Final Project', href: '/learn' },
+    { name: 'Apa Itu Coding', href: '/learn/level-1' },
+    { name: 'Algorithm', href: '/learn/level-2' },
+    { name: 'HTML', href: '/learn/level-3' },
+    { name: 'CSS', href: '/learn/level-4' },
+    { name: 'JavaScript', href: '/learn/level-5' },
+    { name: 'Final Project', href: '/learn/level-6' },
   ];
 
   const bantuanLinks = [
@@ -45,25 +44,18 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative w-full overflow-hidden isolate pt-10 sm:pt-16 md:pt-20 pb-8 sm:pb-6 mt-auto">
-      {/* Background Graphic Image (footerbg.png) */}
-      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
-        <Image
-          src="/home/footerbg.png"
-          alt="CodeKids Footer Background"
-          fill
-          priority={false}
-          sizes="100vw"
-          className="object-cover object-bottom w-full h-full"
-        />
-      </div>
+    <footer className="relative w-full overflow-hidden isolate pt-12 sm:pt-16 md:pt-20 pb-8 sm:pb-6 mt-auto bg-gradient-to-b from-[#F6F8FC] via-[#E8F2FE] to-[#D5E8FD] border-t border-blue-100/70">
+      {/* Soft Ambient Cloud Glows */}
+      <div className="absolute -top-12 left-1/4 w-96 h-48 bg-white/80 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-8 right-12 w-80 h-40 bg-blue-100/60 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -bottom-10 left-12 w-72 h-36 bg-white/70 rounded-full blur-2xl pointer-events-none" />
 
       {/* Main Footer Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Content Layout Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-8 sm:pb-12 items-start">
           
-          {/* Column 1: Logo, Subtitle, & Social Icons (md:col-span-5 lg:col-span-4) */}
+          {/* Column 1: Logo, Subtitle, & Social Icons */}
           <div className="md:col-span-5 lg:col-span-4 space-y-3.5 sm:space-y-4">
             <Link href="/" className="inline-block transition-transform hover:scale-105">
               <Image
@@ -110,8 +102,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Links Section (md:col-span-7 lg:col-span-5) */}
-          <div className="md:col-span-7 lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-6 sm:gap-6">
+          {/* Links Section */}
+          <div className="md:col-span-7 lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-6 sm:gap-8">
             
             {/* Column 2: Navigasi */}
             <div className="space-y-2.5 sm:space-y-3">
@@ -180,10 +172,6 @@ export default function Footer() {
               </ul>
             </div>
           </div>
-
-          {/* Spacer for Robot illustration on right side in desktop view */}
-          <div className="hidden lg:block lg:col-span-3 min-h-[180px] pointer-events-none" />
-
         </div>
 
         {/* Bottom Horizontal Border Divider */}

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Lock } from 'lucide-react';
 
 interface CourseCardData {
   id: number;
@@ -14,6 +14,7 @@ interface CourseCardData {
   materials: string;
   buttonText: string;
   href: string;
+  isComingSoon?: boolean;
   buttonStyles: {
     bg: string;
     hoverBg: string;
@@ -99,13 +100,14 @@ const courseCards: CourseCardData[] = [
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
     materials: '5 Materi',
-    buttonText: 'Mulai Belajar',
-    href: '/learn/level-5',
+    buttonText: 'Coming Soon',
+    href: '#',
+    isComingSoon: true,
     buttonStyles: {
-      bg: 'bg-[#FAF5FF]',
-      hoverBg: 'hover:bg-[#F3E8FF]',
-      text: 'text-[#9333EA]',
-      border: 'border-[#E9D5FF]',
+      bg: 'bg-slate-100',
+      hoverBg: 'hover:bg-slate-100',
+      text: 'text-slate-400',
+      border: 'border-slate-200',
     },
   },
   {
@@ -116,13 +118,14 @@ const courseCards: CourseCardData[] = [
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
     materials: '5 Materi',
-    buttonText: 'Mulai Belajar',
-    href: '/learn/level-6',
+    buttonText: 'Coming Soon',
+    href: '#',
+    isComingSoon: true,
     buttonStyles: {
-      bg: 'bg-[#F0F9FF]',
-      hoverBg: 'hover:bg-[#E0F2FE]',
-      text: 'text-[#0284C7]',
-      border: 'border-[#BAE6FD]',
+      bg: 'bg-slate-100',
+      hoverBg: 'hover:bg-slate-100',
+      text: 'text-slate-400',
+      border: 'border-slate-200',
     },
   },
 ];
@@ -145,12 +148,24 @@ export default function CourseGrid() {
                 width={1832}
                 height={858}
                 priority={card.id <= 3}
-                className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                className={`w-full h-auto object-cover transition-transform duration-300 ${
+                  card.isComingSoon 
+                    ? 'grayscale contrast-95 opacity-85' 
+                    : 'group-hover:scale-[1.02]'
+                }`}
               />
+
+              {/* Coming Soon Badge Overlay */}
+              {card.isComingSoon && (
+                <div className="absolute top-3 right-3 px-3.5 py-1.5 rounded-full bg-[#17233C]/85 backdrop-blur-md text-white text-xs font-black tracking-wide shadow-md flex items-center gap-1.5 border border-white/20 select-none">
+                  <span className="w-2 h-2 rounded-full bg-[#FFD84D] animate-pulse" />
+                  <span>Coming Soon</span>
+                </div>
+              )}
             </div>
 
             {/* Middle 3-Feature Icons Section with Vertical Divider Lines */}
-            <div className="px-3 sm:px-4 pt-3 pb-1">
+            <div className={`px-3 sm:px-4 pt-3 pb-1 ${card.isComingSoon ? 'grayscale opacity-60' : ''}`}>
               <div className="grid grid-cols-3 my-2.5">
                 {/* Feature 1: Level */}
                 <div className="flex flex-col items-center text-center border-r border-blue-100/80 pr-1">
@@ -213,13 +228,24 @@ export default function CourseGrid() {
 
             {/* Bottom Color-Themed Action Button */}
             <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-0.5">
-              <Link
-                href={card.href}
-                className={`w-full py-2.5 sm:py-3 px-5 rounded-full font-extrabold text-sm sm:text-base transition-all duration-200 shadow-xs hover:shadow-md active:scale-98 inline-flex items-center justify-center gap-1.5 border-2 ${card.buttonStyles.bg} ${card.buttonStyles.hoverBg} ${card.buttonStyles.text} ${card.buttonStyles.border}`}
-              >
-                <span>{card.buttonText}</span>
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
-              </Link>
+              {card.isComingSoon ? (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full py-2.5 sm:py-3 px-5 rounded-full font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 border-2 bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed select-none shadow-none"
+                >
+                  <span>Coming Soon</span>
+                  <Lock className="w-4 h-4 stroke-[2.5]" />
+                </button>
+              ) : (
+                <Link
+                  href={card.href}
+                  className={`w-full py-2.5 sm:py-3 px-5 rounded-full font-extrabold text-sm sm:text-base transition-all duration-200 shadow-xs hover:shadow-md active:scale-98 inline-flex items-center justify-center gap-1.5 border-2 ${card.buttonStyles.bg} ${card.buttonStyles.hoverBg} ${card.buttonStyles.text} ${card.buttonStyles.border}`}
+                >
+                  <span>{card.buttonText}</span>
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
+                </Link>
+              )}
             </div>
           </div>
         ))}
