@@ -16,12 +16,13 @@ export function getApiKey(): string {
   ).trim();
 }
 
-// Priority order for Gemini models (100% active & recommended by Google Gemini API in 2026)
+// Priority order for Gemini models sorted by real-world responsiveness & availability
 const PRIORITY_MODELS = [
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
-  'gemini-3.5-flash-lite',
-  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash-lite', // Fastest (< 1s latency, ~600ms), highly available, minimal token overhead
+  'gemini-3.5-flash',      // Fast (~2s latency), high quality & stability
+  'gemini-3.1-flash-lite', // Reliable fallback
+  'gemini-3.7-flash',      // Secondary fallback
+  'gemini-3.8-flash',      // Secondary fallback
 ];
 
 const SYSTEM_PROMPT = `
@@ -37,8 +38,49 @@ Aturan Respon (SANGAT KETAT):
 6. RUMUS & LOGIKA MATEMATIKA: Gunakan format LaTeX Math jika menyertakan ekspresi matematika/logika (inline \\( ... \\) atau block \\[ ... \\]).
 `.trim();
 
-let activeWorkingModel = 'gemini-3.8-flash';
+let activeWorkingModel = 'gemini-3.5-flash-lite';
 let discoveredModelsCache: string[] | null = null;
+const modelCooldownMap = new Map<string, number>();
+
+// Helper to check if model is currently in temporary cooldown (due to 503/429/overload)
+function isModelInCooldown(modelName: string): boolean {
+  const until = modelCooldownMap.get(modelName);
+  if (!until) return false;
+  if (Date.now() > until) {
+    modelCooldownMap.delete(modelName);
+    return false;
+  }
+  return true;
+}
+
+function setModelCooldown(modelName: string, durationMs = 180000) {
+  modelCooldownMap.set(modelName, Date.now() + durationMs);
+}
+
+function isServerOverloadedError(err: any): boolean {
+  const msg = (err?.message || String(err)).toLowerCase();
+  return (
+    msg.includes('503') ||
+    msg.includes('high demand') ||
+    msg.includes('temporarily unavailable') ||
+    msg.includes('overloaded') ||
+    msg.includes('429') ||
+    msg.includes('rate limit') ||
+    msg.includes('resource exhausted') ||
+    msg.includes('quota') ||
+    msg.includes('404') ||
+    msg.includes('not found') ||
+    msg.includes('no longer available')
+  );
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMsg: string): Promise<T> {
+  let timer: any;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(errorMsg)), timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
+}
 
 /**
  * Dynamic Model Discovery: Fetches active models from Google Gemini API endpoint
@@ -98,7 +140,7 @@ async function callGeminiRestApi(
       role: 'user',
       parts: [{ text: `[System Prompt]\n${SYSTEM_PROMPT}` }],
     },
-    ...history.slice(-6).map((msg) => ({
+    ...history.slice(-4).map((msg) => ({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.content }],
     })),
@@ -141,9 +183,10 @@ async function callGeminiRestApi(
 
 /**
  * Ultra-fast primary function with Streaming Support:
- * - Uses activeWorkingModel directly (zero initial round-trip latency)
- * - Limits context history to last 6 messages to keep processing fast
- * - Streams chunks to onStreamChunk in real-time (sub-500ms initial response)
+ * - Uses activeWorkingModel directly (gemini-3.5-flash-lite, sub-second latency)
+ * - Limits context history to last 4 messages to keep payload lean and fast
+ * - Streams chunks to onStreamChunk in real-time
+ * - Automatically skips overloaded (503/429) models with zero hanging latency
  */
 export async function sendMessageToGemini(
   history: ChatMessage[],
@@ -155,15 +198,15 @@ export async function sendMessageToGemini(
     throw new Error('API Key Google Gemini belum terpasang. Pastikan variabel NEXT_PUBLIC_GEMINI_API_KEY sudah diisi pada file .env.local atau Vercel Environment Variables.');
   }
 
-  // Put activeWorkingModel first for instant hit without discovery delay
-  const candidateModels = Array.from(
-    new Set([activeWorkingModel, ...PRIORITY_MODELS])
-  );
+  // Filter out any models currently in temporary cooldown due to 503/429/404 errors
+  const allCandidates = Array.from(new Set([activeWorkingModel, ...PRIORITY_MODELS]));
+  const healthyCandidates = allCandidates.filter((m) => !isModelInCooldown(m));
+  const candidateModels = healthyCandidates.length > 0 ? healthyCandidates : allCandidates;
 
   let lastError: any = null;
 
   for (const modelName of candidateModels) {
-    // 1. Try official SDK with real-time streaming
+    // 1. Try official SDK with real-time streaming (Fast 5.5s timeout for connection)
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
@@ -175,8 +218,8 @@ export async function sendMessageToGemini(
         },
       });
 
-      // Keep recent context compact for lightning-fast token processing
-      const compactHistory = history.slice(-6).map((msg) => ({
+      // Keep recent context compact (last 4 messages) for lightning-fast token processing
+      const compactHistory = history.slice(-4).map((msg) => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }],
       }));
@@ -185,46 +228,86 @@ export async function sendMessageToGemini(
         history: compactHistory,
       });
 
-      // Streaming execution for sub-second first-token arrival
-      try {
-        const streamResult = await chatSession.sendMessageStream(userPrompt);
-        let accumulatedText = '';
+      // Streaming execution with 5.5s connection timeout to prevent hanging models
+      const streamResult = await withTimeout(
+        chatSession.sendMessageStream(userPrompt),
+        5500,
+        `Koneksi streaming model ${modelName} melebihi batas waktu (5.5 detik)`
+      );
 
-        for await (const chunk of streamResult.stream) {
-          const chunkText = chunk.text();
-          if (chunkText) {
-            accumulatedText += chunkText;
-            if (onStreamChunk) {
-              onStreamChunk(accumulatedText);
-            }
+      let accumulatedText = '';
+      for await (const chunk of streamResult.stream) {
+        const chunkText = chunk.text();
+        if (chunkText) {
+          accumulatedText += chunkText;
+          if (onStreamChunk) {
+            onStreamChunk(accumulatedText);
           }
         }
+      }
 
-        if (accumulatedText.trim().length > 0) {
-          activeWorkingModel = modelName;
-          return accumulatedText;
-        }
-      } catch (streamErr) {
-        // Fallback to non-stream if streaming method fails on this model
-        console.warn(`Streaming failed on ${modelName}, trying standard sendMessage:`, streamErr);
-        const result = await chatSession.sendMessage(userPrompt);
+      if (accumulatedText.trim().length > 0) {
+        activeWorkingModel = modelName;
+        return accumulatedText;
+      }
+    } catch (sdkError: any) {
+      console.warn(
+        `OmniBot AI: Streaming gagal pada model ${modelName} (${sdkError?.message || sdkError})`
+      );
+      lastError = sdkError;
+
+      // If the error is 503 (High Demand) or 429/404, immediately skip retries on this model and try next model
+      if (isServerOverloadedError(sdkError)) {
+        console.warn(`OmniBot AI: Model ${modelName} mengalami kendala server (503/429/404). Langsung beralih ke model berikutnya.`);
+        setModelCooldown(modelName);
+        continue;
+      }
+
+      // If not server overloaded, try standard non-streaming with short 5s timeout
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: SYSTEM_PROMPT,
+          generationConfig: {
+            maxOutputTokens: 600,
+            temperature: 0.7,
+          },
+        });
+        const chatSession = model.startChat({
+          history: history.slice(-4).map((msg) => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }],
+          })),
+        });
+
+        const result = await withTimeout(
+          chatSession.sendMessage(userPrompt),
+          5000,
+          `Standard sendMessage on ${modelName} timeout`
+        );
         const responseText = result.response.text();
         if (responseText) {
           activeWorkingModel = modelName;
           if (onStreamChunk) onStreamChunk(responseText);
           return responseText;
         }
+      } catch (nonStreamErr: any) {
+        lastError = nonStreamErr;
+        if (isServerOverloadedError(nonStreamErr)) {
+          setModelCooldown(modelName);
+          continue;
+        }
       }
-    } catch (sdkError: any) {
-      console.warn(
-        `OmniBot AI: SDK call failed for ${modelName} (${sdkError?.message || sdkError}), trying REST API fallback...`
-      );
-      lastError = sdkError;
     }
 
-    // 2. Try REST API Fallback for this model
+    // 2. Try REST API Fallback for this model with 5s timeout
     try {
-      const restResponse = await callGeminiRestApi(modelName, history, userPrompt);
+      const restResponse = await withTimeout(
+        callGeminiRestApi(modelName, history, userPrompt),
+        5000,
+        `REST API call on ${modelName} timeout`
+      );
       if (restResponse) {
         activeWorkingModel = modelName;
         if (onStreamChunk) onStreamChunk(restResponse);
@@ -232,20 +315,27 @@ export async function sendMessageToGemini(
       }
     } catch (restError: any) {
       console.warn(
-        `OmniBot AI: REST API call failed for model ${modelName} (${restError?.message || restError}). Trying next model...`
+        `OmniBot AI: REST API call gagal untuk model ${modelName} (${restError?.message || restError}). Mencoba model berikutnya...`
       );
       lastError = restError;
+      if (isServerOverloadedError(restError)) {
+        setModelCooldown(modelName);
+      }
     }
   }
 
   // If initial models failed, try dynamic model discovery as final fallback
   try {
     const discovered = await discoverAvailableModels();
-    const remainingModels = discovered.filter((m) => !candidateModels.includes(m));
+    const remainingModels = discovered.filter((m) => !candidateModels.includes(m) && !isModelInCooldown(m));
 
     for (const fallbackModel of remainingModels) {
       try {
-        const restResponse = await callGeminiRestApi(fallbackModel, history, userPrompt);
+        const restResponse = await withTimeout(
+          callGeminiRestApi(fallbackModel, history, userPrompt),
+          5000,
+          `Fallback REST API on ${fallbackModel} timeout`
+        );
         if (restResponse) {
           activeWorkingModel = fallbackModel;
           if (onStreamChunk) onStreamChunk(restResponse);

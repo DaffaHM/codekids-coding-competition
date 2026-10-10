@@ -5160,6 +5160,73 @@ push git
   2. Optimalisasi pembesaran tombol maskot AI Chatbot pada tampilan mobile (`w-20 h-20` / 80px) dan penghapusan badge *"Tanya AI"* ([`AIChatWidget.tsx`](file:///d:/Coding/codekids/src/components/AIChatWidget.tsx)).
   3. Pembaruan riwayat log instruksi ([`RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md)).
 
+---
+
+## Prompt 137
+
+Tanggal: 2026-10-10
+
+Task: Perbaikan Error 503 High Demand dan Optimalisasi Latensi Respon AI Chatbot
+
+### Prompt Asli
+
+```text
+generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:streamGenerateContent?alt=sse:1  Failed to load resource: the server responded with a status of 503 ()
+3ybkywc7q6v5l.js:17 Streaming failed on gemini-3.8-flash, trying standard sendMessage: eN: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:streamGenerateContent?alt=sse: [503 ] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.
+    at eP (3ybkywc7q6v5l.js:5:30592)
+    at async eF (3ybkywc7q6v5l.js:5:30405)
+    at async eZ (3ybkywc7q6v5l.js:5:36020)
+tl @ 3ybkywc7q6v5l.js:17
+
+
+
+
+ai nya responnya lama
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah**:
+  - Model `gemini-3.8-flash` pada server Google sedang mengalami lonjakan beban (*503 High Demand / Spikes in demand*).
+  - Ketika streaming pada model `gemini-3.8-flash` gagal dengan kode 503, kode lama di [`src/services/aiChatService.ts`](file:///d:/Coding/codekids/src/services/aiChatService.ts) melakukan percobaan ulang (*retry*) ke model yang sama sebanyak 2 kali lagi (melalui `sendMessage` dan `callGeminiRestApi`). Hal ini menyebabkan delay berulang hingga puluhan detik pada model yang sedang *down*.
+  - Selain itu, model kedua di daftar prioritas (`gemini-3.7-flash`) mengalami gantung (*hang*) hingga ratusan detik pada endpoint streaming Google.
+  - Berdasarkan uji latensi aktual pada endpoint API key, model **`gemini-3.5-flash-lite`** terbukti aktif 100% dan memberikan waktu respon ultra-cepat (< 900 ms) dengan latensi pertama token hanya ~600 ms.
+- **Implementasi Perbaikan di [`src/services/aiChatService.ts`](file:///d:/Coding/codekids/src/services/aiChatService.ts)**:
+  1. **Mengubah Prioritas Model ke Model Tercepat & Paling Stabil**:
+     - `activeWorkingModel` diatur ke **`gemini-3.5-flash-lite`** (latensi rata-rata ~870 ms).
+     - Daftar `PRIORITY_MODELS` diurutkan berdasarkan ketersediaan dan latensi: `gemini-3.5-flash-lite`, `gemini-3.5-flash`, `gemini-3.1-flash-lite`, `gemini-3.7-flash`, `gemini-3.8-flash`.
+  2. **Fast Connection Timeout (5.5 Detik)**:
+     - Mengimplementasikan `withTimeout` dengan batas 5.5 detik pada inisiasi koneksi streaming. Jika sebuah model menggantung atau tidak merespon dalam 5.5 detik, sistem otomatis membatalkan dan langsung beralih ke model cadangan berikutnya.
+  3. **Pencegahan Retry pada Model Error 503 / 429**:
+     - Jika sebuah model mengembalikan status 503 (*High demand*) atau 429 (*Rate limit*), sistem tidak mengulang pada model yang sama, melainkan langsung memasukkannya ke cooldown 3 menit dan seketika mengeksekusi model cadangan yang sehat.
+  4. **Konteks Riwayat Lebih Ringkas**:
+     - Membatasi riwayat pesan ke 4 interaksi terakhir agar pemrosesan token dan payload jaringan semakin cepat.
+- **Verifikasi Kualitas**:
+  - Pengujian langsung di Node.js: Respon streaming berhasil dalam **870 ms** (< 1 detik).
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+
+---
+
+## Prompt 138
+
+Tanggal: 2026-10-10
+
+Task: Push Git Pembaruan Penanganan Model AI dan Optimasi Latensi
+
+### Prompt Asli
+
+```text
+push
+```
+
+### Ringkasan Hasil
+
+- Melakukan staging, commit, dan push seluruh perubahan ke remote repository (`origin/main`):
+  1. Optimasi latensi AI Chatbot dan penanganan error 503 (*High demand*) dengan prioritas model `gemini-3.5-flash-lite`, batas waktu koneksi cepat 5.5 detik, dan eliminasi retry berulang pada model yang *down* ([`src/services/aiChatService.ts`](file:///d:/Coding/codekids/src/services/aiChatService.ts)).
+  2. Pembaruan dokumentasi log instruksi pengembangan ([`RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md)).
+
+
+
 
 
 
