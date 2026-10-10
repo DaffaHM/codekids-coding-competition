@@ -5,6 +5,7 @@ import Link from 'next/link';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import ChallengeBox, { ChallengeData } from './ChallengeBox';
+import ChallengeSuccessModal from './ChallengeSuccessModal';
 import { Play, ArrowRight, Code2 } from 'lucide-react';
 
 import CourseCertificateClaim from '@/components/certificate/CourseCertificateClaim';
@@ -138,6 +139,7 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
   const [validationStatus, setValidationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isFinishedAll, setIsFinishedAll] = useState<boolean>(false);
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
 
   React.useEffect(() => {
     const existing = getCertificateProgress('level-4');
@@ -147,6 +149,10 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
   }, []);
 
   const currentChallenge = LEVEL_4_CHALLENGES[challengeIndex];
+  const nextChallenge =
+    challengeIndex < LEVEL_4_CHALLENGES.length - 1
+      ? LEVEL_4_CHALLENGES[challengeIndex + 1]
+      : undefined;
 
   const handleApplyCss = () => {
     setHasRun(true);
@@ -156,19 +162,26 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
       setRenderedCss(userCss);
       setValidationStatus('success');
       setErrorMessage('');
-
-      if (challengeIndex === LEVEL_4_CHALLENGES.length - 1) {
-        setIsFinishedAll(true);
-        onComplete();
-      } else {
-        setTimeout(() => {
-          setChallengeIndex((prev) => prev + 1);
-          setValidationStatus('idle');
-        }, 1600);
-      }
+      // Open celebratory popup so the child knows they succeeded and what the next instruction is
+      setShowSuccessModal(true);
     } else {
       setValidationStatus('error');
       setErrorMessage(result.errorMessage || 'Belum sesuai. Coba periksa kembali CSS-mu.');
+    }
+  };
+
+  const handleProceedNext = () => {
+    setShowSuccessModal(false);
+
+    if (challengeIndex < LEVEL_4_CHALLENGES.length - 1) {
+      setChallengeIndex((prev) => prev + 1);
+      setValidationStatus('idle');
+      if (userCss && !userCss.endsWith('\n')) {
+        setUserCss((prev) => prev + '\n');
+      }
+    } else {
+      setIsFinishedAll(true);
+      onComplete();
     }
   };
 
@@ -195,6 +208,7 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
           totalChallenges={LEVEL_4_CHALLENGES.length}
           validationStatus={validationStatus}
           errorMessage={errorMessage}
+          onProceedNext={handleProceedNext}
         />
       )}
 
@@ -225,8 +239,8 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
             placeholder="Tulis CSS-mu di sini..."
           />
 
-          {/* Action Button: Terapkan CSS */}
-          <div className="flex items-center justify-center sm:justify-start">
+          {/* Action Buttons: Terapkan CSS & Lanjut Tantangan */}
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
             <button
               type="button"
               onClick={handleApplyCss}
@@ -235,6 +249,17 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
               <Play className="w-5 h-5 fill-current" />
               <span>Terapkan CSS</span>
             </button>
+
+            {validationStatus === 'success' && challengeIndex < LEVEL_4_CHALLENGES.length - 1 && (
+              <button
+                type="button"
+                onClick={handleProceedNext}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#42C88A] hover:bg-[#36b278] text-white font-black text-base transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-in fade-in"
+              >
+                <span>Lanjut Tantangan {challengeIndex + 2}</span>
+                <ArrowRight className="w-5 h-5 stroke-[2.5]" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -277,6 +302,18 @@ export default function CssCodePlayground({ onComplete, onReset }: CssCodePlaygr
           </div>
         </div>
       )}
+
+      {/* Challenge Success Modal / Pop-up */}
+      <ChallengeSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        currentStepNumber={challengeIndex + 1}
+        totalSteps={LEVEL_4_CHALLENGES.length}
+        currentChallengeTitle={currentChallenge.title}
+        successMessage={currentChallenge.successMessage}
+        nextChallenge={nextChallenge}
+        onProceed={handleProceedNext}
+      />
     </div>
   );
 }

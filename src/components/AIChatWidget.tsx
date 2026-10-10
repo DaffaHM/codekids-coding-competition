@@ -218,7 +218,7 @@ export default function AIChatWidget() {
     <div
       className={`fixed z-50 font-sans select-none transition-all duration-300 ${
         isOpen
-          ? 'bottom-4 right-4 sm:bottom-6 sm:right-6'
+          ? 'bottom-3 right-3 sm:bottom-6 sm:right-6'
           : isLessonPage
           ? 'bottom-20 sm:bottom-24 right-3 sm:right-6'
           : 'bottom-4 sm:bottom-6 right-3 sm:right-6'
@@ -231,7 +231,7 @@ export default function AIChatWidget() {
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Tanya CodeKids AI Tutor"
-          className="group relative flex items-center justify-center w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer drop-shadow-xl hover:drop-shadow-2xl"
+          className="group relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer drop-shadow-xl hover:drop-shadow-2xl"
         >
           {/* Lottie 3D Mascot */}
           <div className="w-full h-full relative z-10 pointer-events-none">
@@ -251,18 +251,18 @@ export default function AIChatWidget() {
       {/* CHATBOT WIDGET WINDOW                              */}
       {/* ================================================== */}
       {isOpen && (
-        <div className="w-[calc(100vw-2rem)] sm:w-[410px] h-[630px] max-h-[86vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="w-[calc(100vw-1.5rem)] sm:w-[420px] h-[640px] max-h-[88vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300">
           {/* ------------------------------------------------ */}
           {/* VIBRANT BRAND HEADER                             */}
           {/* ------------------------------------------------ */}
-          <div className="bg-gradient-to-r from-[#1D4ED8] via-[#2563EB] to-[#3B82F6] text-white px-3.5 sm:px-4 py-3 flex items-center justify-between shrink-0 shadow-md relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[#1D4ED8] via-[#2563EB] to-[#3B82F6] text-white px-3.5 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between shrink-0 shadow-md relative overflow-hidden">
             {/* Subtle background glow/shapes */}
             <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
             <div className="absolute left-1/3 -top-6 w-20 h-20 bg-white/10 rounded-full blur-lg pointer-events-none" />
 
             {/* Left: Brand Title & Badges */}
-            <div className="flex items-center gap-2.5 min-w-0 relative z-10">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 relative z-10">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                 <DotLottieReact src={LOTTIE_MASCOT_URL} loop autoplay />
               </div>
 
@@ -273,7 +273,7 @@ export default function AIChatWidget() {
                     <span className="text-[#FFD84D]">Kids</span>
                     <span className="text-white ml-0.5 font-bold">AI Tutor</span>
                   </h3>
-                  <span className="bg-[#BFDBFE] text-[#1E3A8A] text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+                  <span className="bg-[#BFDBFE] text-[#1E3A8A] text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
                     CODING
                   </span>
                 </div>
@@ -285,32 +285,32 @@ export default function AIChatWidget() {
             </div>
 
             {/* Right: Window Controls (Clear, Minimize, Close) */}
-            <div className="flex items-center gap-1 shrink-0 relative z-10">
+            <div className="flex items-center gap-1.5 shrink-0 relative z-10">
               <button
                 onClick={handleClearHistory}
                 title="Bersihkan Percakapan"
                 aria-label="Bersihkan Percakapan"
-                className="w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >
-                <RiBrushLine className="w-3.5 h-3.5" />
+                <RiBrushLine className="w-4 h-4" />
               </button>
 
               <button
                 onClick={() => setIsOpen(false)}
                 title="Minimize Chat"
                 aria-label="Minimize Chat"
-                className="w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >
-                <RiSubtractLine className="w-3.5 h-3.5" />
+                <RiSubtractLine className="w-4 h-4" />
               </button>
 
               <button
                 onClick={() => setIsOpen(false)}
                 title="Tutup AI Chat"
                 aria-label="Tutup AI Chat"
-                className="w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >
-                <RiCloseLine className="w-4 h-4" />
+                <RiCloseLine className="w-4.5 h-4.5" />
               </button>
             </div>
           </div>
@@ -484,7 +484,7 @@ export default function AIChatWidget() {
           {/* ------------------------------------------------ */}
           {/* WIDGET FOOTER - CLEAN INPUT FORM                 */}
           {/* ------------------------------------------------ */}
-          <div className="p-3 bg-white border-t border-slate-200/80 shrink-0">
+          <div className="p-3 sm:p-3.5 bg-white border-t border-slate-200/80 shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -496,7 +496,7 @@ export default function AIChatWidget() {
                 type="button"
                 title="Bantu debug error kode"
                 onClick={() => handleSendMessage('Bantu perbaiki dan debug error pada kode saya')}
-                className="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200/80 text-slate-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                className="w-11 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200/80 text-slate-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >
                 <RiImageAddLine className="w-5 h-5" />
               </button>
@@ -509,7 +509,7 @@ export default function AIChatWidget() {
                 onKeyDown={handleKeyDown}
                 placeholder="Tanya soal HTML, CSS, JS, Python..."
                 disabled={isLoading}
-                className="flex-1 bg-slate-100/90 border border-transparent focus:border-blue-400 focus:bg-white rounded-full px-4 py-2.5 text-xs sm:text-sm text-[#17233C] placeholder:text-slate-400 font-medium focus:outline-none transition-all disabled:opacity-60"
+                className="flex-1 bg-slate-100/90 border border-transparent focus:border-blue-400 focus:bg-white rounded-full px-4 py-2.5 sm:py-3 text-sm text-[#17233C] placeholder:text-slate-400 font-medium focus:outline-none transition-all disabled:opacity-60"
               />
 
               <button

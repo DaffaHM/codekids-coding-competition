@@ -5056,6 +5056,114 @@ buat hitam putih dan comingsoon
   - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
   - `npm run build`: Berhasil 100% kompilasi produksi Next.js.
 
+---
+
+## Prompt 133
+
+Tanggal: 2026-10-10
+
+Task: Pop-up / Modal Konfirmasi Keberhasilan Tantangan dan Pengumuman Perintah Selanjutnya
+
+### Prompt Asli
+
+```text
+kan disini kalo berhasil akan suruh perintah ke dua nah kasih pop up apa kek jadi user tau ada pertintah lagi,
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah**:
+  - Pada latihan coding interaktif (seperti Level 3 HTML dan Level 4 CSS), ketika pengguna berhasil menyelesaikan tantangan pertama atau kedua, sistem sebelumnya hanya mengandalkan `setTimeout` selama 1.6 detik dan langsung berpindah ke tantangan berikutnya tanpa pemberitahuan atau modal yang jelas. Hal ini membuat anak/pengguna kaget, bingung apa yang baru saja terjadi, dan tidak menyadari adanya instruksi/perintah tantangan selanjutnya.
+- **Implementasi Komponen Reusable `ChallengeSuccessModal` ([`src/components/editor/ChallengeSuccessModal.tsx`](file:///d:/Coding/codekids/src/components/editor/ChallengeSuccessModal.tsx))**:
+  - Dibuat modal pop-up ramah anak dan berestetika tinggi:
+    - **Selebrasi Interaktif**: Ikon piala/konfeti animasi berputar, badge penanda *"Tantangan X dari Y Selesai!"*, judul ceria *"Hore, Berhasil! 🎉"*, dan pesan konfirmasi kode benar.
+    - **Kartu Cuplikan Perintah Selanjutnya**: Menampilkan box bergaris putus-putus dengan badge penanda pulsing dot *"Perintah Selanjutnya"*, judul tantangan berikutnya (misal: *Challenge 2 — Tambahkan Paragraf*), instruksi lengkap, dan petunjuk penulisan (*code hint*).
+    - **Tombol Aksi Jelas**: Tombol primer *"Lanjut ke Tantangan {X+1} 🚀"* serta tombol sekunder *"Lihat Hasil Kode Terlebih Dahulu"*.
+    - **Penyelesaian Seluruh Tantangan**: Jika semua tantangan telah tuntas, modal secara dinamis menampilkan apresiasi kelulusan dan tombol *"Klaim Sertifikat Sekarang 🎓"*.
+- **Integrasi pada Code Editor ([`CodePlayground.tsx`](file:///d:/Coding/codekids/src/components/editor/CodePlayground.tsx) & [`CssCodePlayground.tsx`](file:///d:/Coding/codekids/src/components/editor/CssCodePlayground.tsx))**:
+  - Menggantikan transisi otomatis `setTimeout` dengan memunculkan modal pop-up ketika `isValid === true`.
+  - Menjaga kode HTML/CSS pengguna dan Live Preview tetap tampil utuh (tidak terhapus) saat transisi antar-tantangan sehingga anak dapat meneruskan kode yang telah dibuat.
+  - Menambahkan tombol aksi cepat *"Lanjut Tantangan {X+1}"* di sebelah tombol *"Jalankan Kode"* dan di dalam kartu [`ChallengeBox.tsx`](file:///d:/Coding/codekids/src/components/editor/ChallengeBox.tsx) ketika status validasi berhasil.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+  - HTTP Server test: `200 OK` pada Level 3 dan Level 4 practice reader.
+
+---
+
+## Prompt 134
+
+Tanggal: 2026-10-10
+
+Task: Membesarkan Ukuran Widget AI Chatbot di Tampilan Mobile
+
+### Prompt Asli
+
+```text
+di tampilan mobile widget ai chat bot nya terlalu keicl coba besarkan lagi
+```
+
+### Ringkasan Hasil
+
+- **Akar Masalah**:
+  - Pada [`src/components/AIChatWidget.tsx`](file:///d:/Coding/codekids/src/components/AIChatWidget.tsx), ukuran tombol mengambang (*floating trigger button*) maskot AI sebelumnya menggunakan kelas `w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20`. Karena Tailwind v4 tidak memiliki breakpoint `xs:`, di perangkat mobile ukurannya terkunci hanya **56 x 56 piksel** (`w-14 h-14`), sehingga maskot 3D terlihat terlalu kecil, kurang mencolok, dan sulit ditekan oleh anak-anak.
+  - Jendela pop-up chat ketika dibuka juga memiliki ruang margin yang agak sempit di layar ponsel.
+- **Implementasi Optimalisasi Ukuran Mobile**:
+  - **Membesarkan Tombol Maskot Mengambang**:
+    - Ukuran tombol maskot ditingkatkan menjadi **80 x 80 piksel** (`w-20 h-20 sm:w-24 sm:h-24`) — peningkatan lebih dari 40% pada layar mobile.
+    - Menambahkan badge pill *"Tanya AI"* mengambang di bawah maskot dengan titik status hijau aktif (*pulsing green dot*), membuat tombol semakin ramah anak dan jelas fungsinya.
+  - **Optimalisasi Jendela Chat Widget**:
+    - Lebar jendela chat disesuaikan menjadi `w-[calc(100vw-1.5rem)] sm:w-[420px]` dengan tinggi `h-[640px] max-h-[88vh]`, memberikan tata letak yang proporsional, nyaman, dan tidak sesak di berbagai layar smartphone.
+    - Ukuran avatar maskot di header ditingkatkan menjadi `w-9 h-9 sm:w-10 sm:h-10`, tombol window controls diperbesar menjadi `w-8 h-8`, dan kolom input chat disesuaikan dengan font `text-sm` serta padding nyaman untuk mencegah auto-zoom di browser mobile.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+
+---
+
+## Prompt 135
+
+Tanggal: 2026-10-10
+
+Task: Hapus Badge "Tanya AI" pada Tombol Mengambang Widget AI Chatbot
+
+### Prompt Asli
+
+```text
+gausah ada badge tanya ai
+```
+
+### Ringkasan Hasil
+
+- **Penyesuaian Komponen [`src/components/AIChatWidget.tsx`](file:///d:/Coding/codekids/src/components/AIChatWidget.tsx)**:
+  - Menghapus elemen badge label kapsul *"Tanya AI"* yang berada di bawah tombol maskot mengambang.
+  - Tampilan maskot 3D Lottie berukuran 80 x 80 px di mobile kini tampil lebih bersih, proporsional, dan minimalis tanpa elemen teks yang menutupi bagian bawahnya.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lulus tanpa error TypeScript.
+
+---
+
+## Prompt 136
+
+Tanggal: 2026-10-10
+
+Task: Push Git Seluruh Perubahan Terakhir ke Repository Remote
+
+### Prompt Asli
+
+```text
+push git
+```
+
+### Ringkasan Hasil
+
+- Melakukan staging, commit, dan push seluruh perubahan ke remote repository (`origin/main`):
+  1. Pop-up modal selebrasi dan pengumuman perintah tantangan selanjutnya ([`ChallengeSuccessModal.tsx`](file:///d:/Coding/codekids/src/components/editor/ChallengeSuccessModal.tsx), [`ChallengeBox.tsx`](file:///d:/Coding/codekids/src/components/editor/ChallengeBox.tsx), [`CodePlayground.tsx`](file:///d:/Coding/codekids/src/components/editor/CodePlayground.tsx), [`CssCodePlayground.tsx`](file:///d:/Coding/codekids/src/components/editor/CssCodePlayground.tsx)).
+  2. Optimalisasi pembesaran tombol maskot AI Chatbot pada tampilan mobile (`w-20 h-20` / 80px) dan penghapusan badge *"Tanya AI"* ([`AIChatWidget.tsx`](file:///d:/Coding/codekids/src/components/AIChatWidget.tsx)).
+  3. Pembaruan riwayat log instruksi ([`RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md)).
+
+
+
+
+
 
 
 

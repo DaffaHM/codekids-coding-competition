@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, CheckCircle2, AlertCircle, HelpCircle } from 'lucide-react';
+import { Sparkles, CheckCircle2, AlertCircle, HelpCircle, ArrowRight } from 'lucide-react';
 
 export interface ChallengeData {
   id: number;
@@ -17,6 +17,7 @@ interface ChallengeBoxProps {
   totalChallenges: number;
   validationStatus: 'idle' | 'success' | 'error';
   errorMessage?: string;
+  onProceedNext?: () => void;
 }
 
 export default function ChallengeBox({
@@ -25,6 +26,7 @@ export default function ChallengeBox({
   totalChallenges,
   validationStatus,
   errorMessage = 'Tulis kode sesuai petunjuk lalu jalankan lagi.',
+  onProceedNext,
 }: ChallengeBoxProps) {
   return (
     <div className="bg-white border-2 border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-xs space-y-4">
@@ -74,11 +76,27 @@ export default function ChallengeBox({
       )}
 
       {validationStatus === 'success' && (
-        <div className="bg-[#F0FDF4] border-2 border-[#42C88A] rounded-2xl p-4 flex items-center gap-3 text-[#17233C] animate-in fade-in">
-          <CheckCircle2 className="w-5 h-5 text-[#42C88A] shrink-0 stroke-[2.5]" />
-          <p className="text-xs sm:text-sm font-black text-[#16A34A]">
-            {challenge.successMessage}
-          </p>
+        <div className="bg-[#F0FDF4] border-2 border-[#42C88A] rounded-2xl p-4 sm:p-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[#17233C] animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-[#42C88A] shrink-0 stroke-[2.5]" />
+            <p className="text-xs sm:text-sm font-black text-[#16A34A]">
+              {challenge.successMessage}
+            </p>
+          </div>
+          {onProceedNext && (
+            <button
+              type="button"
+              onClick={onProceedNext}
+              className="px-4 py-2 rounded-xl bg-[#42C88A] hover:bg-[#36b278] text-white font-black text-xs sm:text-sm shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <span>
+                {currentChallengeIndex + 1 < totalChallenges
+                  ? `Lanjut Tantangan ${currentChallengeIndex + 2}`
+                  : 'Klaim Sertifikat'}
+              </span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            </button>
+          )}
         </div>
       )}
     </div>
