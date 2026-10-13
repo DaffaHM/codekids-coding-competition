@@ -5891,3 +5891,75 @@ push
     - [`src/app/layout.tsx`](file:///d:/Coding/codekids/src/app/layout.tsx): Pendaftaran icons metadata.
     - [`prompts/RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md): Dokumentasi Prompt 160 & 161.
   - Melakukan staging (`git add .`), commit deskriptif, dan `git push origin main`.
+
+---
+
+## Prompt 162
+
+Tanggal: 2026-10-13
+
+Task: Perbaiki Gap / Offset Posisi Kartu Drag and Drop di Mobile yang Menjauh dari Jari/Kursor
+
+### Prompt Asli
+
+```text
+di mobile ketika mau nmge drag card nya malah nge jauh jadi ga deket tangan posisinya jadi kaya ada gap antara jadi atau cursor dan card yang kita drag
+[Screenshot: Posisi Kartu 4 meloncat ke posisi atas dengan jarak gap offset dari jari]
+```
+
+### Analisis Akar Masalah (Mengapa Terjadi Gap / Menjauh)
+
+1. **CSS Containing Block Conflict pada `position: fixed`**:
+   - `DragOverlay` dari `@dnd-kit` merender elemen overlay dengan gaya internal `position: fixed; top: rect.top; left: rect.left`.
+   - Sebelumnya, pembungkus konten di [`PageTransition.tsx`](file:///d:/Coding/codekids/src/components/common/PageTransition.tsx) memiliki kelas `.animate-page-enter` dengan deklarasi `animation: pageEnter 0.28s ... forwards;` yang menyisakan `transform: translateY(0);`.
+   - Berdasarkan spesifikasi CSS W3C, elemen leluhur yang memiliki nilai `transform` non-none akan menjadi **containing block baru** bagi seluruh elemen `position: fixed` di dalamnya.
+   - Akibatnya, saat pengguna di HP menggulir layar ke bawah (*scrolled* e.g. 200–400px), koordinat `top: rect.top` yang dihitung oleh `@dnd-kit` (berdasarkan viewport) malah diposisikan relatif terhadap kontainer halaman yang tergulir. Hal ini membuat kartu yang di-drag langsung meloncat ratusan piksel ke atas layar, jauh meninggalkan posisi jari pengguna.
+   - Deteksi tabrakan `closestCenter` mendeteksi kartu berada di atas, sehingga kartu langsung tertukar ke slot nomor 1.
+2. **Tidak Menggunakan React Portal**:
+   - `<DragOverlay>` sebelumnya dirender in-place di dalam pohon DOM komponen anak, sehingga terperangkap dalam batas kontainer dan transform orang tua.
+3. **Mismatched Layout Antara `SortableItem` & `DragOverlayItem`**:
+   - `DragOverlayItem` sebelumnya menggunakan lebar statis `w-[calc(100vw-3rem)] max-w-sm` dan tidak memiliki tombol panah reorder placeholder di sisi kanan. Hal ini menyebabkan tata letak internal kartu (jarak judul dan grip ke tepi kanan) bergeser sekitar 60–90px saat kartu diangkat, menimbulkan efek gap horizontal.
+4. **Konflik Transisi CSS `transition-all`**:
+   - Kelas `transition-all duration-200` pada kartu memicu transisi CSS buatan saat `@dnd-kit` mengubah koordinat `transform`, menimbulkan lag gerakan antara jari dan kartu.
+
+### Solusi & Ringkasan Hasil
+
+- **Isolasi Penuh Menggunakan React Portal ([`src/components/common/SortableList.tsx`](file:///d:/Coding/codekids/src/components/common/SortableList.tsx))**:
+  - Membungkus `<DragOverlay>` menggunakan `createPortal(..., document.body)` langsung ke root `document.body`.
+  - Dengan mount langsung di `<body>`, `DragOverlay` bebas 100% dari batasan CSS transform, container query, overflow, maupun scroll container leluhur. Nilai `rect.top` dan `rect.left` selalu presisi 1:1 terhadap koordinat layar di bawah jari pengguna.
+- **Pembersihan `forwards` Transform pada CSS ([`src/app/globals.css`](file:///d:/Coding/codekids/src/app/globals.css))**:
+  - Mengubah keyframe `pageEnter` pada 100% menjadi `transform: none;` dan menghapus `forwards` pada `.animate-page-enter`. Setelah transisi masuk 0.28s selesai, elemen wrapper tidak lagi menyisakan properti `transform` yang dapat merusak `position: fixed`.
+- **Penyelarasan Presisi `DragOverlayItem` (Pixel-Perfect Mirroring)**:
+  - Mengubah dimensi `DragOverlayItem` menjadi `w-full h-full` mengikuti `rect.width` dan `rect.height` kartu asli dari `@dnd-kit`.
+  - Menyertakan placeholder tombol panah (▲/▼) di sisi kanan dengan posisi identik, sehingga saat kartu disentuh dan diangkat, bentuk, teks, dan posisi grip tidak mengalami pergeseran (0px shift).
+- **Penghapusan `transition-all` pada Draggable Card**:
+  - Mengganti `transition-all duration-200` menjadi `transition-colors` agar transisi koordinat `transform` dikendalikan secara instan oleh `@dnd-kit` tanpa hambatan animasi CSS buatan.
+- **Pencegahan Event Bubbling pada Tombol Panah**:
+  - Menambahkan `onTouchStart={(e) => e.stopPropagation()}` pada tombol panah agar sentuhan tombol tidak memicu sensor drag.
+  - Mengatur `TouchSensor` tolerance ke `8px` (`delay: 150ms`).
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lolos tanpa kendala tipe TypeScript.
+  - `npm run build`: 100% sukses kompilasi produksi Turbopack dalam 1.8 detik.
+
+---
+
+## Prompt 163
+
+Tanggal: 2026-10-13
+
+Task: Push Pembaruan Perbaikan Gap / Offset Drag Mobile ke GitHub Repository
+
+### Prompt Asli
+
+```text
+push
+```
+
+### Ringkasan Hasil
+
+- **Sinkronisasi Kode ke GitHub**:
+  - Menyiapkan berkas-berkas yang telah diperbaiki:
+    - [`src/components/common/SortableList.tsx`](file:///d:/Coding/codekids/src/components/common/SortableList.tsx): Penambahan `createPortal(..., document.body)` untuk `DragOverlay`, pixel-perfect layout mirroring, penggantian `transition-all` ke `transition-colors`, dan `onTouchStart` propagation guard.
+    - [`src/app/globals.css`](file:///d:/Coding/codekids/src/app/globals.css): Pembersihan `forwards` dan penyetelan `transform: none` pada `.animate-page-enter` untuk mengeliminasi containing block bug.
+    - [`prompts/RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md): Dokumentasi Prompt 162 & 163.
+  - Melakukan staging (`git add .`), commit deskriptif, dan `git push origin main`.

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import {
   DndContext,
@@ -67,10 +68,10 @@ function SortableItem({ item, index, totalItems, onMoveUp, onMoveDown }: Sortabl
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative rounded-2xl sm:rounded-3xl bg-white border-2 transition-all duration-200 select-none ${
+      className={`group relative rounded-2xl sm:rounded-3xl bg-white border-2 select-none ${
         isDragging
           ? 'opacity-30 border-dashed border-[#4F7DF3] bg-blue-50/50 shadow-inner'
-          : 'border-slate-200/80 hover:border-[#4F7DF3]/60 hover:shadow-md sm:hover:-translate-y-1'
+          : 'border-slate-200/80 hover:border-[#4F7DF3]/60 hover:shadow-md sm:hover:-translate-y-1 transition-colors'
       }`}
     >
       {/* Mobile Row Layout (< 640px) */}
@@ -113,6 +114,7 @@ function SortableItem({ item, index, totalItems, onMoveUp, onMoveDown }: Sortabl
               e.stopPropagation();
               onMoveUp(index);
             }}
+            onTouchStart={(e) => e.stopPropagation()}
             aria-label={`Pindahkan ${item.label} ke atas`}
             className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-[#4F7DF3] disabled:opacity-25 disabled:pointer-events-none flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
           >
@@ -125,6 +127,7 @@ function SortableItem({ item, index, totalItems, onMoveUp, onMoveDown }: Sortabl
               e.stopPropagation();
               onMoveDown(index);
             }}
+            onTouchStart={(e) => e.stopPropagation()}
             aria-label={`Pindahkan ${item.label} ke bawah`}
             className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-[#4F7DF3] disabled:opacity-25 disabled:pointer-events-none flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
           >
@@ -175,13 +178,13 @@ function SortableItem({ item, index, totalItems, onMoveUp, onMoveDown }: Sortabl
 // Rendered inside DragOverlay for smooth dragging feedback
 function DragOverlayItem({ item, index }: { item: SortableStepItem; index: number }) {
   return (
-    <div className="w-[calc(100vw-3rem)] max-w-sm sm:w-56 rounded-2xl sm:rounded-3xl bg-white border-2 border-[#4F7DF3] shadow-2xl ring-4 ring-[#4F7DF3]/20 select-none cursor-grabbing">
+    <div className="w-full h-full rounded-2xl sm:rounded-3xl bg-white border-2 border-[#4F7DF3] shadow-2xl ring-4 ring-[#4F7DF3]/20 select-none cursor-grabbing">
       {/* Mobile Drag Overlay */}
       <div className="flex sm:hidden items-center justify-between p-3 gap-2 min-h-[68px] w-full">
         <span className="w-8 h-8 rounded-full bg-[#4F7DF3] text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md">
           {index + 1}
         </span>
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 py-1">
           {item.imageSrc ? (
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
               <Image
@@ -199,8 +202,16 @@ function DragOverlayItem({ item, index }: { item: SortableStepItem; index: numbe
             {item.label}
           </span>
         </div>
-        <div className="p-1 text-[#4F7DF3] shrink-0">
-          <GripVertical className="w-5 h-5 stroke-[2.5]" />
+        <div className="flex items-center gap-1 shrink-0 ml-1">
+          <div className="w-7 h-7 rounded-lg bg-slate-100/50 text-slate-300 flex items-center justify-center pointer-events-none">
+            <ChevronUp className="w-4 h-4 stroke-[3]" />
+          </div>
+          <div className="w-7 h-7 rounded-lg bg-slate-100/50 text-slate-300 flex items-center justify-center pointer-events-none">
+            <ChevronDown className="w-4 h-4 stroke-[3]" />
+          </div>
+          <div className="p-1 text-[#4F7DF3] shrink-0">
+            <GripVertical className="w-5 h-5 stroke-[2.5]" />
+          </div>
         </div>
       </div>
 
@@ -263,7 +274,7 @@ export default function SortableList({
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 150,
-        tolerance: 6,
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -413,11 +424,16 @@ export default function SortableList({
           </div>
         </SortableContext>
 
-        <DragOverlay adjustScale={false}>
-          {activeItem ? (
-            <DragOverlayItem item={activeItem} index={activeIndex} />
-          ) : null}
-        </DragOverlay>
+        {isMounted && typeof document !== 'undefined'
+          ? createPortal(
+              <DragOverlay adjustScale={false} zIndex={1000}>
+                {activeItem ? (
+                  <DragOverlayItem item={activeItem} index={activeIndex} />
+                ) : null}
+              </DragOverlay>,
+              document.body
+            )
+          : null}
       </DndContext>
     </div>
   );
