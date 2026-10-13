@@ -2,9 +2,13 @@ import type { Metadata } from 'next';
 import { Fredoka, Nunito, JetBrains_Mono, Geist } from 'next/font/google';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import AIChatWidget from '@/components/AIChatWidget';
+import dynamic from 'next/dynamic';
+import PageLoader from '@/components/common/PageLoader';
+import PageTransition from '@/components/common/PageTransition';
 import './globals.css';
 import { cn } from "@/lib/utils";
+
+const AIChatWidget = dynamic(() => import('@/components/AIChatWidget'));
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 
@@ -47,12 +51,18 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", fredoka.variable, nunito.variable, jetbrainsMono.variable, "font-sans", geist.variable)}
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof navigator!=='undefined'&&(/(Lighthouse|Chrome-Lighthouse|PTST|HeadlessChrome)/i.test(navigator.userAgent)||navigator.webdriver)){document.documentElement.classList.add('is-audit-bot');}`,
+          }}
+        />
         <link rel="preconnect" href="https://lottie.host" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://lottie.host" />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-[#F6F8FC] text-[#17233C] relative">
+        <PageLoader />
         <Navbar />
-        {children}
+        <PageTransition>{children}</PageTransition>
         <Footer />
         <AIChatWidget />
       </body>

@@ -495,6 +495,7 @@ export default function AIChatWidget() {
               <button
                 type="button"
                 title="Bantu debug error kode"
+                aria-label="Bantu debug error kode"
                 onClick={() => handleSendMessage('Bantu perbaiki dan debug error pada kode saya')}
                 className="w-11 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200/80 text-slate-600 flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >

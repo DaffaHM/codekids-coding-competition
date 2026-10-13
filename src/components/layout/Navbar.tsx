@@ -248,17 +248,14 @@ export default function Navbar() {
                     }}
                     href={item.href}
                     onClick={closeMobileMenu}
-                    className={`flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-extrabold transition-all ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-extrabold transition-all ${
                       isActive
                         ? 'bg-[#4F7DF3] text-white shadow-xs'
                         : 'text-[#17233C] hover:bg-slate-100/80'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      {item.icon}
-                      <span>{item.name}</span>
-                    </div>
-                    <RiArrowRightLine className="w-4 h-4 opacity-60" />
+                    {item.icon}
+                    <span>{item.name}</span>
                   </Link>
                 );
               })}
@@ -267,10 +264,9 @@ export default function Navbar() {
                 <Link
                   href="/learn"
                   onClick={closeMobileMenu}
-                  className="flex items-center justify-center gap-2 bg-[#FFD84D] hover:bg-[#FFE169] text-[#17233C] text-sm font-black py-3 rounded-2xl shadow-md w-full"
+                  className="flex items-center justify-center bg-[#FFD84D] hover:bg-[#FFE169] text-[#17233C] text-sm font-black py-3 rounded-2xl shadow-md w-full transition-transform active:scale-98"
                 >
                   <span>Mulai Belajar Sekarang</span>
-                  <RiArrowRightLine className="w-4.5 h-4.5" />
                 </Link>
               </div>
             </div>

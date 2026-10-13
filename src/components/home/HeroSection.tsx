@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import ImageTrail from '@/components/ImageTrail';
+import dynamic from 'next/dynamic';
+
+const ImageTrail = dynamic(() => import('@/components/ImageTrail'), { ssr: false });
 
 const STICKER_IMAGES = [
   '/sticker/stiker1.png',
@@ -77,7 +79,7 @@ export default function HeroSection() {
             alt="CodeKids Hero Background Mobile"
             fill
             priority
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 0px"
             className="object-cover object-top w-full h-full"
           />
         </div>
@@ -91,7 +93,7 @@ export default function HeroSection() {
               alt="LEARN TO CODE. BUILD SOMETHING COOL."
               width={2048}
               height={768}
-              priority
+              sizes="(max-width: 768px) 100vw, 0px"
               className="w-full h-auto object-contain drop-shadow-sm"
             />
           </div>

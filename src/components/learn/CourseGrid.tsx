@@ -154,14 +154,6 @@ export default function CourseGrid() {
                     : 'group-hover:scale-[1.02]'
                 }`}
               />
-
-              {/* Coming Soon Badge Overlay */}
-              {card.isComingSoon && (
-                <div className="absolute top-3 right-3 px-3.5 py-1.5 rounded-full bg-[#17233C]/85 backdrop-blur-md text-white text-xs font-black tracking-wide shadow-md flex items-center gap-1.5 border border-white/20 select-none">
-                  <span className="w-2 h-2 rounded-full bg-[#FFD84D] animate-pulse" />
-                  <span>Coming Soon</span>
-                </div>
-              )}
             </div>
 
             {/* Middle 3-Feature Icons Section with Vertical Divider Lines */}
