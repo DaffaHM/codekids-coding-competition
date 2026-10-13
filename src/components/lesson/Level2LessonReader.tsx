@@ -201,7 +201,7 @@ export default function Level2LessonReader() {
                   <span>Instruksi:</span>
                 </div>
                 <ul className="space-y-1.5 list-disc list-inside text-slate-700 font-bold leading-relaxed">
-                  <li><span className="text-[#17233C]">Geser / tarik kartu</span> di bawah ini ke kiri atau kanan untuk menyusun urutan langkah dari awal hingga selesai.</li>
+                  <li><span className="text-[#17233C]">Susun urutan kartu</span> di bawah ini (geser kartu atau tekan tombol ▲/▼ di HP) dari langkah awal hingga selesai.</li>
                   <li><span className="text-[#17233C]">Tekan tombol</span> <span className="text-[#4F7DF3] font-black">"Jalankan"</span> untuk memeriksa urutan yang kamu susun.</li>
                 </ul>
               </div>

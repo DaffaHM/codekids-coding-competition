@@ -38,6 +38,11 @@ export const metadata: Metadata = {
   description:
     'Website edukasi interaktif untuk siswa sekolah dasar (SD). Pelajari logika coding, algoritma, HTML, CSS, dan JavaScript dengan mudah dan menyenangkan!',
   keywords: ['CodeKids', 'belajar coding anak', 'coding SD', 'HTML', 'CSS', 'JavaScript', 'edukasi web'],
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({

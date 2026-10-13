@@ -6,7 +6,7 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -19,10 +19,11 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   rectSortingStrategy,
+  verticalListSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 
 export interface SortableStepItem {
   id: string;
@@ -42,9 +43,12 @@ export interface SortableListProps {
 interface SortableItemProps {
   item: SortableStepItem;
   index: number;
+  totalItems: number;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
 }
 
-function SortableItem({ item, index }: SortableItemProps) {
+function SortableItem({ item, index, totalItems, onMoveUp, onMoveDown }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -63,20 +67,25 @@ function SortableItem({ item, index }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className={`group relative rounded-2xl sm:rounded-3xl bg-white border-2 transition-all duration-200 select-none cursor-grab active:cursor-grabbing touch-none ${
+      className={`group relative rounded-2xl sm:rounded-3xl bg-white border-2 transition-all duration-200 select-none ${
         isDragging
           ? 'opacity-30 border-dashed border-[#4F7DF3] bg-blue-50/50 shadow-inner'
           : 'border-slate-200/80 hover:border-[#4F7DF3]/60 hover:shadow-md sm:hover:-translate-y-1'
       }`}
     >
       {/* Mobile Row Layout (< 640px) */}
-      <div className="flex sm:hidden items-center justify-between p-3 gap-3 min-h-[64px] w-full">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <span className="w-8 h-8 rounded-full bg-[#3B82F6] text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
-            {index + 1}
-          </span>
+      <div className="flex sm:hidden items-center justify-between p-3 gap-2 min-h-[68px] w-full">
+        {/* Step Number Badge */}
+        <span className="w-8 h-8 rounded-full bg-[#3B82F6] text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+          {index + 1}
+        </span>
+
+        {/* Draggable Content Area (Image/Icon & Full Label) */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="flex items-center gap-2.5 min-w-0 flex-1 py-1 cursor-grab active:cursor-grabbing touch-none"
+        >
           {item.imageSrc ? (
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
               <Image
@@ -90,17 +99,53 @@ function SortableItem({ item, index }: SortableItemProps) {
           ) : item.icon ? (
             <span className="text-2xl shrink-0">{item.icon}</span>
           ) : null}
-          <span className="text-sm font-extrabold text-[#17233C] truncate">
+          <span className="text-xs sm:text-sm font-black text-[#17233C] leading-snug break-words">
             {item.label}
           </span>
         </div>
-        <div className="p-1 text-slate-400 group-hover:text-[#4F7DF3] shrink-0 pointer-events-none">
-          <GripVertical className="w-5 h-5 stroke-[2.5]" />
+
+        {/* Mobile Quick Reorder Buttons (Up / Down) & Grab Grip */}
+        <div className="flex items-center gap-1 shrink-0 ml-1">
+          <button
+            type="button"
+            disabled={index === 0}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp(index);
+            }}
+            aria-label={`Pindahkan ${item.label} ke atas`}
+            className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-[#4F7DF3] disabled:opacity-25 disabled:pointer-events-none flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
+          >
+            <ChevronUp className="w-4 h-4 stroke-[3]" />
+          </button>
+          <button
+            type="button"
+            disabled={index === totalItems - 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown(index);
+            }}
+            aria-label={`Pindahkan ${item.label} ke bawah`}
+            className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-[#4F7DF3] disabled:opacity-25 disabled:pointer-events-none flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
+          >
+            <ChevronDown className="w-4 h-4 stroke-[3]" />
+          </button>
+          <div
+            {...attributes}
+            {...listeners}
+            className="p-1 text-slate-400 group-hover:text-[#4F7DF3] shrink-0 touch-none cursor-grab active:cursor-grabbing"
+          >
+            <GripVertical className="w-5 h-5 stroke-[2.5]" />
+          </div>
         </div>
       </div>
 
       {/* Desktop Large Vertical Card Layout (>= 640px) */}
-      <div className="hidden sm:flex flex-col items-center justify-between p-5 h-full min-h-[280px] w-full">
+      <div
+        {...attributes}
+        {...listeners}
+        className="hidden sm:flex flex-col items-center justify-between p-5 h-full min-h-[280px] w-full cursor-grab active:cursor-grabbing"
+      >
         <span className="w-10 h-10 rounded-full bg-[#3B82F6] text-white font-black text-base flex items-center justify-center shadow-xs self-start shrink-0">
           {index + 1}
         </span>
@@ -128,15 +173,15 @@ function SortableItem({ item, index }: SortableItemProps) {
 }
 
 // Rendered inside DragOverlay for smooth dragging feedback
-function DragOverlayItem({ item, index }: SortableItemProps) {
+function DragOverlayItem({ item, index }: { item: SortableStepItem; index: number }) {
   return (
-    <div className="w-full max-w-sm sm:w-56 rounded-2xl sm:rounded-3xl bg-white border-2 border-[#4F7DF3] shadow-2xl ring-4 ring-[#4F7DF3]/20 select-none cursor-grabbing">
+    <div className="w-[calc(100vw-3rem)] max-w-sm sm:w-56 rounded-2xl sm:rounded-3xl bg-white border-2 border-[#4F7DF3] shadow-2xl ring-4 ring-[#4F7DF3]/20 select-none cursor-grabbing">
       {/* Mobile Drag Overlay */}
-      <div className="flex sm:hidden items-center justify-between p-3 gap-3 min-h-[64px] w-full">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <span className="w-8 h-8 rounded-full bg-[#4F7DF3] text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md">
-            {index + 1}
-          </span>
+      <div className="flex sm:hidden items-center justify-between p-3 gap-2 min-h-[68px] w-full">
+        <span className="w-8 h-8 rounded-full bg-[#4F7DF3] text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md">
+          {index + 1}
+        </span>
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
           {item.imageSrc ? (
             <div className="w-12 h-12 flex items-center justify-center shrink-0">
               <Image
@@ -150,7 +195,7 @@ function DragOverlayItem({ item, index }: SortableItemProps) {
           ) : (
             <span className="text-2xl shrink-0">{item.icon}</span>
           )}
-          <span className="text-sm font-black text-[#17233C] truncate">
+          <span className="text-xs sm:text-sm font-black text-[#17233C] leading-snug break-words">
             {item.label}
           </span>
         </div>
@@ -196,22 +241,29 @@ export default function SortableList({
 }: SortableListProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Avoid hydration mismatch for dnd-kit SSR
+  // Avoid hydration mismatch for dnd-kit SSR and detect mobile viewport
   useEffect(() => {
     setIsMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 150,
-        tolerance: 5,
+        tolerance: 6,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -239,6 +291,18 @@ export default function SortableList({
     setActiveId(null);
   };
 
+  const handleMoveUp = (index: number) => {
+    if (index > 0) {
+      onItemsChange(arrayMove(items, index, index - 1));
+    }
+  };
+
+  const handleMoveDown = (index: number) => {
+    if (index < items.length - 1) {
+      onItemsChange(arrayMove(items, index, index + 1));
+    }
+  };
+
   const activeIndex = activeId ? items.findIndex((item) => item.id === activeId) : -1;
   const activeItem = activeIndex !== -1 ? items[activeIndex] : null;
 
@@ -261,9 +325,9 @@ export default function SortableList({
           {items.map((item, index) => (
             <div
               key={item.id}
-              className="rounded-2xl sm:rounded-3xl p-3 sm:p-5 bg-white border-2 border-slate-200/80 flex items-center sm:flex-col sm:justify-between min-h-[64px] sm:min-h-[280px]"
+              className="rounded-2xl sm:rounded-3xl p-3 sm:p-5 bg-white border-2 border-slate-200/80 flex items-center sm:flex-col sm:justify-between min-h-[68px] sm:min-h-[280px]"
             >
-              <div className="flex items-center gap-3 sm:hidden">
+              <div className="flex items-center gap-3 sm:hidden w-full">
                 <span className="w-8 h-8 rounded-full bg-[#3B82F6] text-white font-black text-xs flex items-center justify-center shrink-0">
                   {index + 1}
                 </span>
@@ -276,7 +340,7 @@ export default function SortableList({
                     className="w-12 h-12 object-contain"
                   />
                 )}
-                <span className="text-sm font-extrabold text-[#17233C]">
+                <span className="text-xs sm:text-sm font-black text-[#17233C] leading-snug">
                   {item.label}
                 </span>
               </div>
@@ -333,16 +397,23 @@ export default function SortableList({
       >
         <SortableContext
           items={items.map((item) => item.id)}
-          strategy={rectSortingStrategy}
+          strategy={isMobile ? verticalListSortingStrategy : rectSortingStrategy}
         >
           <div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-5 sm:gap-5 items-stretch w-full">
             {items.map((item, index) => (
-              <SortableItem key={item.id} item={item} index={index} />
+              <SortableItem
+                key={item.id}
+                item={item}
+                index={index}
+                totalItems={items.length}
+                onMoveUp={handleMoveUp}
+                onMoveDown={handleMoveDown}
+              />
             ))}
           </div>
         </SortableContext>
 
-        <DragOverlay>
+        <DragOverlay adjustScale={false}>
           {activeItem ? (
             <DragOverlayItem item={activeItem} index={activeIndex} />
           ) : null}

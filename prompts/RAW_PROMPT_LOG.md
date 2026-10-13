@@ -5823,7 +5823,71 @@ coba pastikan ketika di teast ini 100 performenst atau setidak nya hijau
   - `npx tsc --noEmit`: 100% lolos tanpa kendala tipe TypeScript.
   - `npm run build`: 100% sukses kompilasi produksi Next.js Turbopack.
 
+---
 
+## Prompt 160
 
+Tanggal: 2026-10-13
 
+Task: Perbaiki Fitur Drag and Drop Tampilan Mobile Level 2 dan Ganti Favicon Website
 
+### Prompt Asli
+
+```text
+fitur drag n drop tampilan mobile yang level 2 malah jadi rusak jadi ga sesuai gitu coba cek analisis dan perbaiki dan favicon nya ganti pakea pa kek
+```
+
+### Analisis Akar Masalah Drag and Drop Mobile Level 2
+
+1. **Konflik Sensor Touch & Pointer**:
+   - `PointerSensor` dan `TouchSensor` sebelumnya aktif bersamaan dengan `distance: 5`. Saat pengguna menyentuh layar HP untuk *scrolling* halaman, `PointerSensor` langsung mencegat gestur, mengira pengguna ingin *drag*, sehingga halaman terkunci dan kartu melompat tak terarah.
+2. **`touch-none` Mengunci Gulir Halaman**:
+   - Atribut CSS `touch-none` dipasang pada seluruh kontainer kartu (yang memenuhi >50% tinggi layar ponsel). Akibatnya, sentuhan jari pada kartu memblokir *scroll* browser sepenuhnya.
+3. **Strategi Pengurutan Tidak Sesuai Tata Letak Vertikal**:
+   - Komponen sebelumnya menggunakan `rectSortingStrategy` (untuk grid 2D) pada tata letak kolom vertikal mobile (`flex flex-col`), menyebabkan pergeseran horizontal canggung saat kartu diseret ke atas/bawah.
+4. **Teks Terpotong (*Truncated Text*)**:
+   - Judul langkah seperti *"Masukkan buah ke blender"* dipotong oleh kelas `truncate` sehingga anak tidak bisa membaca instruksi secara lengkap.
+
+### Solusi & Ringkasan Hasil
+
+- **Perbaikan Arsitektur Sensor & Drag Mobile ([`src/components/common/SortableList.tsx`](file:///d:/Coding/codekids/src/components/common/SortableList.tsx))**:
+  - Mengganti sensor menjadi kombinasi bersih `MouseSensor` (untuk desktop) dan `TouchSensor` terkalibrasi (`delay: 150ms`, `tolerance: 6px`) untuk layar sentuh HP. Pengguna kini dapat menggulir halaman (*scroll*) dengan lancar tanpa terkunci, dan cukup menahan kartu 150ms jika ingin menyeret (*drag*).
+  - Menerapkan strategi dinamis: **`verticalListSortingStrategy`** pada layar mobile (< 640px) dan `rectSortingStrategy` pada desktop, sehingga animasi pergeseran kartu di HP 100% mulus naik-turun tanpa lompat diagonal.
+  - **Tombol Tambahan Geser Cepat (▲ dan ▼)**: Menambahkan tombol panah atas/bawah di setiap kartu mobile sebagai alternatif sentuh cepat (1-tap reorder), memudahkan anak-anak yang kesulitan menyeret di layar HP kecil.
+  - Menghapus `truncate` dan menerapkan `break-words leading-snug` agar seluruh teks instruksi terbaca tuntas.
+- **Penyelarasan Instruksi ([`src/components/lesson/Level2LessonReader.tsx`](file:///d:/Coding/codekids/src/components/lesson/Level2LessonReader.tsx))**:
+  - Memperbarui panduan langkah menjadi: *"Susun urutan kartu di bawah ini (geser kartu atau tekan tombol ▲/▼ di HP) dari langkah awal hingga selesai."*
+- **Pembuatan Favicon Baru CodeKids ([`src/app/icon.svg`](file:///d:/Coding/codekids/src/app/icon.svg), [`public/icon.svg`](file:///d:/Coding/codekids/public/icon.svg), [`src/app/layout.tsx`](file:///d:/Coding/codekids/src/app/layout.tsx))**:
+  - Merancang favicon SVG beresolusi tinggi (*vector, ultra-crisp*) dengan desain modern:
+    - Bentuk *squircle* biru royal `#4F7DF3` ke `#2563EB` dengan efek *soft glow*.
+    - Simbol kode `</>` tebal putih dengan garis miring kuning menyala `#FFD84D`.
+    - Aksen bintang kilau emas 4 titik (*golden sparkle star*) di sudut kanan atas.
+  - Didaftarkan otomatis di App Router metadata dan rute statis `○ /icon.svg`.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lolos tanpa kendala tipe TypeScript.
+  - `npm run build`: 100% sukses kompilasi produksi Next.js Turbopack dalam 4.0 detik.
+
+---
+
+## Prompt 161
+
+Tanggal: 2026-10-13
+
+Task: Push Pembaruan Drag & Drop Mobile Level 2 dan Favicon ke GitHub Repository
+
+### Prompt Asli
+
+```text
+push
+```
+
+### Ringkasan Hasil
+
+- **Sinkronisasi Kode ke GitHub**:
+  - Menyiapkan seluruh berkas yang telah diperbaiki:
+    - [`src/components/common/SortableList.tsx`](file:///d:/Coding/codekids/src/components/common/SortableList.tsx): Kalibrasi sensor touch/mouse, layout vertical 1D mobile, tombol panah cepat (▲/▼), dan penghapusan truncate.
+    - [`src/components/lesson/Level2LessonReader.tsx`](file:///d:/Coding/codekids/src/components/lesson/Level2LessonReader.tsx): Penyesuaian instruksi langkah Level 2 untuk mobile & desktop.
+    - [`src/app/icon.svg`](file:///d:/Coding/codekids/src/app/icon.svg) & [`public/icon.svg`](file:///d:/Coding/codekids/public/icon.svg): Pembuatan favicon SVG modern CodeKids.
+    - [`src/app/layout.tsx`](file:///d:/Coding/codekids/src/app/layout.tsx): Pendaftaran icons metadata.
+    - [`prompts/RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md): Dokumentasi Prompt 160 & 161.
+  - Melakukan staging (`git add .`), commit deskriptif, dan `git push origin main`.
