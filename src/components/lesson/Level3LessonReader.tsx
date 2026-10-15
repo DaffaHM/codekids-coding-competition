@@ -153,7 +153,7 @@ export default function Level3LessonReader() {
           <div className="space-y-10 py-2">
             <div className="space-y-3">
               <span className="text-xs font-black text-[#4F7DF3] uppercase tracking-wider bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 inline-block">
-                LEVEL 03 • MATERI 1 DARI 4
+                LEVEL 03 • MATERI 1 DARI 3
               </span>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#17233C] leading-tight tracking-tight">
                 Apa Itu <span className="text-[#4F7DF3]">HTML?</span>
@@ -202,7 +202,7 @@ export default function Level3LessonReader() {
           <div className="space-y-10 py-2">
             <div className="space-y-3">
               <span className="text-xs font-black text-[#4F7DF3] uppercase tracking-wider bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 inline-block">
-                LEVEL 03 • MATERI 2 DARI 4
+                LEVEL 03 • MATERI 2 DARI 3
               </span>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#17233C] leading-tight tracking-tight">
                 Mengenal <span className="text-[#4F7DF3]">Tag HTML</span>
@@ -274,7 +274,7 @@ export default function Level3LessonReader() {
           <div className="space-y-10 py-2">
             <div className="space-y-3">
               <span className="text-xs font-black text-[#4F7DF3] uppercase tracking-wider bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 inline-block">
-                LEVEL 03 • MATERI 3 DARI 4
+                LEVEL 03 • MATERI 3 DARI 3
               </span>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#17233C] leading-tight tracking-tight">
                 HTML Membentuk <span className="text-[#4F7DF3]">Struktur</span>

@@ -1,101 +1,119 @@
 # CodeKids — Curriculum Architecture & Content Specification
 
-## 1. Overview & Learning Path
+## 1. Ikhtisar & Jalur Pembelajaran
 
-The CodeKids curriculum is structured into **6 core topics** adhering to the philosophy:
-**LEARN → UNDERSTAND → PRACTICE → CREATE**
+Kurikulum CodeKids dirancang dengan filosofi berjenjang yang ramah anak:
+$$\text{LEARN} \longrightarrow \text{UNDERSTAND} \longrightarrow \text{PRACTICE} \longrightarrow \text{CREATE}$$
 
-Recommended Learning Sequence:
-`01. Apa Itu Coding?` → `02. Algorithm` → `03. HTML` → `04. CSS` → `05. JavaScript` → `06. Final Project`
-
----
-
-## 2. Topic Details & Learning Goals
-
-### Topic 01: Apa Itu Coding? (What is Coding?)
-- **Format**: 5 structured material sections + 5 Multiple-Choice Questions (MCQs) quiz.
-- **Learning Goals**:
-  - Understand what coding is in simple terms.
-  - Understand that computers require explicit, unambiguous instructions.
-  - Recognize everyday applications of software and code (games, apps, robots, websites).
-  - Understand that instructions must be clear and ordered.
-  - Get introduced to the roles of HTML, CSS, and JavaScript.
-- **Content Sections**:
-  1. *Apa itu Coding?*: Coding adalah cara kita berbicara dan memberikan instruksi kepada komputer.
-  2. *Komputer Membutuhkan Instruksi*: Komputer itu pintar, tapi dia butuh panduan langkah demi langkah.
-  3. *Coding Ada di Sekitar Kita*: Dari game favoritmu, aplikasi HP, hingga mesin cuci otomatis.
-  4. *Coding Harus Jelas dan Berurutan*: Instruksi harus urut dan tidak membingungkan.
-  5. *Bahasa Pemrograman*: Mengenal HTML (struktur), CSS (tampilan), dan JavaScript (aksi).
+Rekomendasi Alur Pembelajaran (*Recommended Path*):
+`01. Apa Itu Coding?` $\longrightarrow$ `02. Algorithm` $\longrightarrow$ `03. HTML` $\longrightarrow$ `04. CSS` $\longrightarrow$ `05. JavaScript (Coming Soon)` $\longrightarrow$ `06. Final Project (Coming Soon)`
 
 ---
 
-### Topic 02: Algorithm (Algoritma)
-- **Format**: Learning material + Sequence/ordering interactive quiz activities.
-- **Learning Goals**:
-  - Understand what an algorithm is (a step-by-step recipe/plan to solve a problem).
-  - Understand sequence and exact order of execution.
-  - Identify logical bugs when steps are out of order.
-- **Content Sections**:
-  1. *Apa itu Algoritma?*: Algoritma adalah langkah-langkah berurutan untuk menyelesaikan masalah (seperti resep membuat kue).
-  2. *Pentingnya Urutan (Sequence)*: Mengapa urutan menyikat gigi atau memakai sepatu itu penting.
-  3. *Menemukan Langkah yang Hilang*: Melatih logika anak menemukan instruksi yang terlewat.
+## 2. Rincian Silabus & Konten per Level
+
+### Level 01: Apa Itu Coding? (What is Coding?)
+- **Status**: ✅ *Implemented*
+- **Format**: **3 Materi Pembelajaran** + Kuis Pilihan Ganda (5 Soal) + Klaim Sertifikat Resmi.
+- **Tujuan Pembelajaran**:
+  - Memahami apa itu coding dalam bahasa yang sangat sederhana.
+  - Memahami bahwa komputer membutuhkan instruksi yang spesifik dan jelas.
+  - Mengenal penerapan coding dalam kehidupan sehari-hari (game, website, aplikasi, robot).
+  - Menyadari bahwa instruksi harus diberikan dalam urutan yang tepat.
+- **Rincian Materi**:
+  1. *Apa itu Coding?*: Definisi dasar coding sebagai instruksi kepada komputer, pengenalan produk digital (`img1.png`, `img2.png`), dan callout *Ingat!*.
+  2. *Komputer Membutuhkan Instruksi*: 4 seksi visual komparasi (komputer tidak bisa menebak, instruksi harus jelas, komputer memproses instruksi, dan akibat jika instruksi salah).
+  3. *Coding Harus Berurutan*: Analogi runut langkah membuat jus buah (`materi3img1.png`), pentingnya urutan langkah, dan pengenalan konsep dasar algoritma.
+- **Kuis Level 01**:
+  - 5 pertanyaan pilihan ganda (definisi coding, kebutuhan instruksi, produk hasil coding, langkah awal membuat jus, bahasa pengatur tampilan).
+  - Umpan balik langsung dengan visual checklist Robo, penjelasan logis, skor akhir, dan tombol coba lagi.
 
 ---
 
-### Topic 03: HTML Basics (Dasar HTML)
-- **Format**: Learning material + Interactive Code Editor & Live Preview.
-- **Learning Goals**:
-  - Understand that HTML creates the structure and skeleton of a webpage.
-  - Recognize tags like `<h1>` to `<h6>`, `<p>`, `<button>`, `<img>`.
-  - Write basic elements and observe live rendering instantly.
-- **Practice Challenge**:
-  - Task: Create a heading `<h1>Halo, Aku CodeKids!</h1>`, a paragraph `<p>Aku sedang belajar HTML.</p>`, and a button `<button>Klik Aku</button>`.
+### Level 02: Algorithm (Algoritma)
+- **Status**: ✅ *Implemented*
+- **Format**: **3 Materi Pembelajaran** (termasuk Aktivitas Drag & Drop Interaktif) + Klaim Sertifikat Resmi.
+- **Tujuan Pembelajaran**:
+  - Memahami algoritma sebagai urutan langkah terencana untuk menyelesaikan masalah.
+  - Melatih pemikiran komputasional (*computational thinking*) dalam menyusun instruksi (*sequence*).
+  - Mengenal konsep kesalahan urutan (*logical bug*) dan dasar-dasar perbaikan (*debugging*).
+- **Rincian Materi**:
+  1. *Buat Jus!*: Aktivitas interaktif menyusun 5 kartu langkah membuat jus buah (Siapkan buah, Potong buah, Masukkan ke blender, Blender buah, Tuangkan ke gelas) menggunakan `@dnd-kit` dengan tombol panah cepat mobile dan umpan balik *live run*.
+  2. *Ketika Urutan Langkah Salah*: Bacaan terstruktur mengenai dampak langkah yang tertukar atau tidak logis dalam algoritma.
+  3. *Menemukan Langkah yang Hilang*: Melatih logika anak menemukan instruksi yang terlewat serta pemahaman proses *debugging*.
+- **Klaim Sertifikat**: Terbuka otomatis setelah menyelesaikan seluruh materi Level 02.
 
 ---
 
-### Topic 04: CSS Basics (Dasar CSS)
-- **Format**: Learning material + Interactive Code Editor & Live Preview.
-- **Learning Goals**:
-  - Understand that CSS styles the appearance of HTML elements (colors, sizes, fonts).
-  - Learn basic CSS properties: `color`, `background-color`, `font-size`, `text-align`, `border-radius`.
-  - Connect CSS declarations to HTML elements.
-- **Practice Challenge**:
-  - Task: Style a heading with color `#4F7DF3`, change paragraph text size, and add a background color to a button.
+### Level 03: HTML Basics (Dasar HTML)
+- **Status**: ✅ *Implemented*
+- **Format**: **3 Materi Bacaan** + **1 Coding Practice Interaktif** (3 Tantangan) + Klaim Sertifikat Resmi.
+- **Tujuan Pembelajaran**:
+  - Memahami bahwa HTML adalah bahasa pembuat struktur dan kerangka dasar halaman website.
+  - Mengenal tag dasar berpasangan: `<h1>`, `<p>`, dan `<button>`.
+  - Belajar menyusun elemen HTML bersama-sama hingga membentuk halaman web utuh.
+- **Rincian Materi**:
+  1. *Apa Itu HTML?*: Konsep analogi kerangka rumah dan 3 fungsi utama HTML (teks, media, tautan).
+  2. *Mengenal Tag HTML*: Anatomi tag pembuka dan penutup, serta 3 tag dasar yang paling sering digunakan (`<h1>`, `<p>`, `<button>`).
+  3. *HTML Membentuk Struktur*: Contoh penyusunan blok kode dari atas ke bawah.
+- **Coding Practice (`CodePlayground`)**:
+  - **Tantangan 1**: Menulis tag heading `<h1>Halo, Aku CodeKids!</h1>`.
+  - **Tantangan 2**: Menambahkan paragraf `<p>Aku sedang belajar HTML.</p>`.
+  - **Tantangan 3**: Menambahkan tombol interaktif `<button>Klik Aku</button>`.
+  - Dilengkapi Live Preview instan, diagnosa kesalahan spesifik (misal: tag belum ditutup), dan modal selebrasi sukses antar-tantangan.
 
 ---
 
-### Topic 05: JavaScript Basics (Dasar JavaScript)
-- **Format**: Learning material + Interactive Code Editor & Live Preview.
-- **Learning Goals**:
-  - Understand that JavaScript gives life, interactivity, and logic to websites.
-  - Learn basic concepts: variables (`let`, `const`), simple functions, and button click events (`onclick`).
-  - Introduce simple conditional checks (`if/else`) and safe age-appropriate loops.
-- **Practice Challenge**:
-  - Task: Attach an `onclick` alert or text change event to a button.
+### Level 04: CSS Basics (Dasar CSS)
+- **Status**: ✅ *Implemented*
+- **Format**: **3 Materi Bacaan** + **1 Coding Practice Interaktif** (3 Tantangan) + Klaim Sertifikat Resmi.
+- **Tujuan Pembelajaran**:
+  - Memahami bahwa CSS bertugas mengatur gaya, warna, ukuran, dan tampilan halaman web.
+  - Mengenal sintaksis CSS: Selector, Property, dan Value.
+  - Mempelajari properti dasar: `color`, `font-size`, `background-color`, dan `border-radius`.
+- **Rincian Materi**:
+  1. *Apa Itu CSS?*: Prinsip pemisahan tugas (HTML membuat struktur, CSS mengatur tampilan).
+  2. *Mengenal Property dan Value*: Cara kerja aturan CSS mengubah properti elemen.
+  3. *Membuat Halaman Lebih Menarik*: Menghubungkan CSS langsung terhadap objek HTML.
+- **Coding Practice (`CssCodePlayground`)**:
+  - Menampilkan struktur HTML awal sebagai konteks yang akan dihias.
+  - **Tantangan 1**: Mengubah warna judul dengan properti `color: #4F7DF3;`.
+  - **Tantangan 2**: Mengubah ukuran teks paragraf dengan `font-size: 18px;`.
+  - **Tantangan 3**: Menghias tombol dengan `background-color` dan `border-radius`.
+  - Live Preview interaktif memperlihatkan perubahan gaya visual seketika.
 
 ---
 
-### Topic 06: Final Project & Certificate (Proyek Akhir & Sertifikat)
-- **Format**: Brief instructions + Full HTML/CSS/JS Coding Workspace + Live Output + Certificate Modal.
-- **Project Brief**: "Buat Website Pertamamu!"
-- **Requirements**:
-  1. Add a custom heading with your name or website title.
-  2. Add at least one paragraph describing yourself or your favorite hobby.
-  3. Apply custom colors and font styling using CSS.
-  4. Create an interactive button that triggers a JavaScript action (e.g., changes text or shows a greeting message).
-- **Certificate Trigger**: Upon fulfilling the requirements, the student enters their name to generate and print/download their official CodeKids certificate.
+### Level 05: JavaScript Basics (Dasar JavaScript)
+- **Status**: ⏳ *Planned (Coming Soon)*
+- **Rencana Format**: 3 Materi Pembelajaran + Coding Practice Interaktif + Klaim Sertifikat.
+- **Tujuan Pembelajaran yang Direncanakan**:
+  - Mengenal JavaScript sebagai bahasa pemberi aksi dan interaktivitas website.
+  - Konsep variabel sederhana (`let`, `const`), nilai teks/angka, dan fungsi dasar.
+  - Menghubungkan aksi klik tombol (`onclick`) dengan perubahan teks atau pesan dialog ramah anak.
 
 ---
 
-## 3. Data Schemas (TypeScript Contracts)
+### Level 06: Final Project (Proyek Akhir)
+- **Status**: ⏳ *Planned (Coming Soon)*
+- **Rencana Format**: 1 Proyek Mandiri Terpadu + Klaim Sertifikat Kelulusan Utama.
+- **Rencana Proyek**: *"Buat Website Pertamamu!"*
+  - Menggabungkan elemen struktur HTML, keindahan gaya CSS, dan interaktivitas tombol JavaScript dalam satu workspace utuh.
+  - Menghasilkan website portofolio mini karya siswa sendiri.
+
+---
+
+## 3. Kontrak Tipe Data Kurikulum (TypeScript)
+
+Mengacu langsung pada implementasi di [`src/types/curriculum.ts`](file:///d:/Coding/codekids/src/types/curriculum.ts):
 
 ```typescript
-export type TopicStatus = 'not_started' | 'in_progress' | 'completed';
+export type TopicType = 'quiz_topic' | 'coding_topic' | 'project_topic';
 
 export interface LessonSection {
   id: string;
   title: string;
-  content: string; // Markdown formatted
+  content: string; // Teks deskripsi atau bacaan terstruktur
   illustrationType?: 'diagram' | 'comparison' | 'code-preview' | 'none';
   illustrationData?: Record<string, unknown>;
 }
@@ -108,29 +126,33 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export interface CodePracticeValidationRule {
+  ruleId: string;
+  description: string;
+  checker: 'tag_exists' | 'style_contains' | 'js_eval';
+  targetSymbol?: string;
+}
+
 export interface CodePractice {
   initialHtml: string;
   initialCss: string;
   initialJs: string;
   instructions: string[];
   solutionHints: string[];
-  validationRules: {
-    ruleId: string;
-    description: string;
-    checker: string; // Evaluation strategy identifier
-  }[];
+  validationRules: CodePracticeValidationRule[];
 }
 
 export interface Topic {
   id: string;
-  number: string; // e.g., "01"
+  number: string;
   title: string;
   subtitle: string;
   description: string;
   icon: string;
-  type: 'quiz_topic' | 'coding_topic' | 'project_topic';
+  type: TopicType;
   sections: LessonSection[];
   quizQuestions?: QuizQuestion[];
   codePractice?: CodePractice;
 }
 ```
+

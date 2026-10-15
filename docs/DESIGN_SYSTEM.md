@@ -1,95 +1,91 @@
 # CodeKids — Design System Specification
 
-## 1. Design Philosophy & Brand Identity
+## 1. Filosofi Desain & Identitas Visual
 
-CodeKids balances **modern technology (70%)** with **approachable playfulness (30%)**. It targets elementary school students in grades 4–6 (ages 9–12). The design is clean, friendly, credible, and educational.
+CodeKids memadukan **teknologi modern (70%)** dengan **nuansa ceria & bersahabat bagi anak (30%)**. Target audiens adalah siswa Sekolah Dasar (SD) kelas 4–6 (usia 9–12 tahun). Desain mengedepankan keterbacaan tinggi (*high legibility*), tata letak bersih, transisi mulus, dan aksen warna harmonis.
 
-### Design Principles:
-1. **Purposeful Visuals**: Illustrations and diagrams are included *only* when they enhance conceptual understanding. Avoid decorative graphic clutter.
-2. **Selective Mascot Usage**: The mascot **Robo** appears as a friendly learning companion on key milestone screens (e.g., Welcome, Quiz Completion, Certificate), never dominating or cluttering lesson content.
-3. **Low Cognitive Load**: High contrast, readable typography, clear call-to-actions, and straightforward navigation.
-4. **Anti-Patterns to Avoid**:
-   - No excessive pastel color palettes or rainbow gradients.
-   - No noisy emoji overload or cartoon decorations.
-   - No heavy glassmorphism, 3D graphics, or distracting game UI overlays.
-   - No excessive border-radii on every single container element.
+### Prinsip Utama Desain:
+1. **Visual Bertujuan (*Purposeful Visuals*)**: Diagram dan ilustrasi 3D dihadirkan untuk memperjelas konsep abstrak (seperti cara kerja instruksi komputer atau analogi langkah membuat jus), bukan sekadar hiasan berlebihan.
+2. **Maskot "Robo" yang Hangat**: Maskot Robo hadir sebagai rekan belajar di logo, halaman sambutan, kuis selesai, dan sertifikat, menciptakan rasa bangga dan pencapaian bagi anak.
+3. **Bebas Kontainer Berlebih (*Direct Clean Reading Layout*)**: Halaman materi menggunakan tata letak langsung (*card-free direct layout*) di atas latar belakang `#F6F8FC` dengan tipografi besar dan gambar proporsional, menghindari bingkai kartu bertumpuk-tumpuk yang membatasi ruang baca.
+4. **Bebas Gamifikasi Semu (*Anti-Pattern Guard*)**: Tidak menggunakan palet warna neon berlebihan, efek suara bising, koin/diamond, atau animasi melayang yang mengalihkan fokus belajar.
 
 ---
 
-## 2. Color Palette
+## 2. Palet Warna & Token Visual
 
-The color system uses Tailwind CSS custom utility extensions mapped to CSS custom properties.
+Sistem warna diimplementasikan menggunakan Tailwind CSS v4 dan variabel kustom CSS:
 
-| Color Name | Hex Code | Purpose / Application |
+### Palet Warna Utama (Core Palette):
+
+| Nama Warna | Kode Hex | Peruntukan / Penggunaan |
 | :--- | :--- | :--- |
-| **Primary Blue** | `#4F7DF3` | Brand primary, main action buttons, active navigation, active step indicators |
-| **Dark Navy** | `#17233C` | Primary text headings, dark structural background elements, contrast cards |
-| **Accent Yellow** | `#FFD84D` | Key highlights, celebratory callouts, badge accents, star indicators |
-| **Pure White** | `#FFFFFF` | Card backgrounds, editor background, primary container fills |
-| **App Background** | `#F6F8FC` | Soft neutral page background |
-| **Success Green** | `#42C88A` | Correct quiz answers, completion badges, success alerts, valid code indicators |
-| **Error Red** | `#FF6B6B` | Incorrect quiz feedback, code error highlights, alert callouts |
+| **Primary Blue** | `#4F7DF3` | Warna brand utama, tombol primer, link aktif, border fokus, aksen teks |
+| **Dark Navy** | `#17233C` | Teks judul utama, teks heading tebal, kontras tinggi yang ramah mata |
+| **Accent Yellow** | `#FFD84D` | Tombol CTA aksi utama (*Mulai Belajar*, *Mulai Kuis*), badge Level, bintang selebrasi |
+| **App Background** | `#F6F8FC` | Latar belakang halaman utama yang lembut dan sejuk |
+| **Pure White** | `#FFFFFF` | Latar belakang kartu, bar navigasi melayang (*sticky header/footer*), editor input |
+| **Success Green** | `#42C88A` / `#16A34A` | Jawaban kuis benar, status tantangan coding selesai, badge kelulusan |
+| **Error Red** | `#FF6B6B` / `#FF5252` | Umpan balik kuis salah, kotak pesan error sintaksis / petunjuk perbaikan |
 
-### Neutral Tones & Muted States:
-- **Text Body**: `#2D3748` (Slate 800)
-- **Text Muted**: `#718096` (Slate 500)
-- **Border Neutral**: `#E2E8F0` (Slate 200)
-- **Card Hover Background**: `#EEF2FF` (Indigo 50)
+### Palet Warna Tematik per Level (Course Theme Palette):
 
----
+Setiap level memiliki identitas warna pastel lembut yang khas pada tombol dan badge di Learning Hub:
 
-## 3. Typography System
-
-### Font Families:
-- **Headings / Titles**: `Fredoka`, `Baloo 2`, or sans-serif rounded fallback (`var(--font-fredoka)`). Friendly, crisp display feel.
-- **Body / Interface**: `Nunito`, `Inter`, or system sans-serif (`var(--font-nunito)`). Maximum legibility for young readers.
-- **Code / Editor**: `JetBrains Mono`, `Fira Code`, or monospace (`var(--font-jetbrains)`). Clean character separation (`0` vs `O`, `l` vs `1`).
-
-### Type Scale:
-- **Display 1 (Hero)**: `3rem` (48px) / Line Height 1.2 / Font Weight 700
-- **Heading 1 (Page Title)**: `2.25rem` (36px) / Line Height 1.25 / Font Weight 700
-- **Heading 2 (Section Title)**: `1.75rem` (28px) / Line Height 1.3 / Font Weight 600
-- **Heading 3 (Card Title)**: `1.25rem` (20px) / Line Height 1.4 / Font Weight 600
-- **Body Large**: `1.125rem` (18px) / Line Height 1.6 / Font Weight 400 or 600
-- **Body Regular**: `1rem` (16px) / Line Height 1.5 / Font Weight 400
-- **Caption / Small**: `0.875rem` (14px) / Line Height 1.4 / Font Weight 500
-- **Code Editor**: `0.95rem` (15px) / Monospace / Line Height 1.5
+- **Level 01 (Coding Basics)**: Biru Royal — Background `#EBF3FF`, Border `#BFDBFE`, Teks `#2563EB`.
+- **Level 02 (Algorithm)**: Kuning Emas/Amber — Background `#FFFBEB`, Border `#FDE68A`, Teks `#D97706`.
+- **Level 03 (HTML)**: Mawar Merah/Rose — Background `#FFF1F2`, Border `#FECDD3`, Teks `#E11D48`.
+- **Level 04 (CSS)**: Hijau Zamrud/Emerald — Background `#F0FDF4`, Border `#BBF7D0`, Teks `#16A34A`.
+- **Level 05 (JavaScript)**: Ungu / Slate *(Coming Soon)* — Background `#FAF5FF`, Border `#E9D5FF`, Teks `#9333EA` (atau `#F1F5F9` saat locked).
+- **Level 06 (Final Project)**: Biru Langit / Slate *(Coming Soon)* — Background `#F0F9FF`, Border `#BAE6FD`, Teks `#0284C7`.
 
 ---
 
-## 4. UI Components & Tokens
+## 3. Sistem Tipografi
 
-### Buttons & Interactive Elements
-- **Primary Button**: Background `#4F7DF3`, Text `#FFFFFF`, Rounded `0.75rem` (12px), Shadow `0 4px 6px -1px rgba(79, 125, 243, 0.2)`. Hover: `#3B68E0`. Active scale: `0.98`.
-- **Secondary / Outline Button**: Border `2px solid #4F7DF3`, Text `#4F7DF3`, Background Transparent. Hover: `#F0F4FE`.
-- **Success Button / Indicator**: Background `#42C88A`, Text `#FFFFFF`.
-- **Quiz Option Card**: White card with `2px solid #E2E8F0`, rounded `1rem` (16px), padding `1.25rem`.
-  - *Hover State*: Border `#4F7DF3`, Background `#F6F8FC`.
-  - *Selected / Correct State*: Border `#42C88A`, Background `#E8F8F0`, Text `#17233C`.
-  - *Incorrect State*: Border `#FF6B6B`, Background `#FEEFEF`, Text `#17233C`.
+Dikelola melalui `next/font/google` pada [`src/app/layout.tsx`](file:///d:/Coding/codekids/src/app/layout.tsx):
 
-### Cards & Containers
-- **Border Radius**: Cards `1rem` (16px), Buttons `0.75rem` (12px), Badges `9999px` (Full pill).
-- **Box Shadows**: Soft ambient shadow `0 10px 25px -5px rgba(23, 35, 60, 0.05)`.
-- **Borders**: Clean `1px solid #E2E8F0` or `2px solid` for focus states.
+- **Font Judul & Display (`--font-fredoka`)**: `Fredoka` (Weights: 400, 600, 700). Memberikan karakter bersahabat, tegas, dan modern pada judul materi dan badge.
+- **Font Konten & Antarmuka (`--font-nunito`, `--font-sans`)**: `Nunito` & `Geist`. Keterbacaan optimal untuk anak-anak dengan x-height proporsional.
+- **Font Kode & Editor (`--font-jetbrains`)**: `JetBrains Mono` (Weights: 400, 600). Pemisahan karakter jelas antara angka nol `0` dan huruf `O`, serta `1` dan `l`.
 
----
-
-## 5. Responsive & Layout Rules
-
-- **Container Max Width**: `1200px` centered with auto padding (`px-4 sm:px-6 lg:px-8`).
-- **Breakpoints**:
-  - `sm`: `640px` (Mobile landscape / small tablets)
-  - `md`: `768px` (Tablets portrait)
-  - `lg`: `1024px` (Desktops / Laptops)
-  - `xl`: `1280px` (Large displays)
-- **Mobile Editor Layout**: On screens `< 768px`, editor and preview toggle via tabs (Editor Tab vs Live Output Tab) to ensure comfortable typing space for smaller devices. On screens `>= 768px`, standard 50/50 side-by-side split.
+### Skala Tipografi:
+- **Hero Display**: `2.5rem` – `3.5rem` (40px – 56px) / Weight 900 / Line Height 1.15
+- **Page Title (H1)**: `2rem` – `2.75rem` (32px – 44px) / Weight 900 / Line Height 1.2
+- **Section Heading (H2)**: `1.5rem` – `1.875rem` (24px – 30px) / Weight 800
+- **Card Subtitle (H3)**: `1.125rem` – `1.25rem` (18px – 20px) / Weight 700
+- **Body Regular**: `1rem` (16px) / Weight 600 / Line Height 1.6
+- **Code Editor / Console**: `0.875rem` – `0.95rem` (14px – 15px) / Monospace / Line Height 1.5
 
 ---
 
-## 6. Accessibility (a11y) Standards
+## 4. Komponen UI & Pola Interaksi
 
-- **Contrast Ratios**: Minimum 4.5:1 for body text against backgrounds.
-- **Focus Rings**: All interactive elements display a prominent focus outline (`ring-2 ring-[#4F7DF3] ring-offset-2`).
-- **Color Independence**: Quiz options and success badges use visible icons (e.g., Checkmark `✓` or Cross `✗`) in addition to color indicators.
-- **Touch Targets**: Minimum target size of `44px x 44px` on mobile for comfortable tapping by children.
+### Tombol (Buttons):
+- **CTA Utama (*Pill Button*)**: `rounded-full`, padding `px-6 py-3`, teks `font-extrabold`. Warna kuning `#FFD84D` dengan efek `active:scale-95` dan bayangan lembut.
+- **Tombol Navigasi Bawah (*Sticky Bottom Navigation*)**: Bar mengambang dengan latar belakang `bg-white/95 backdrop-blur-md` di bagian bawah layar materi, menjamin navigasi maju/mundur selalu dalam jangkauan jari tanpa menutupi konten (dilindungi oleh `pb-28 sm:pb-32` pada kontainer halaman).
+- **Tombol Sortable Panah Cepat (▲/▼)**: Tombol pembantu di setiap kartu drag-and-drop mobile untuk memudahkan anak mengatur urutan langkah tanpa harus menahan geseran panjang.
+
+### Kartu & Kontainer:
+- **Course Card (Learning Hub)**: Sudut melengkung `rounded-3xl`, bayangan halus `shadow-sm hover:shadow-xl hover:-translate-y-1`, gambar kartu rasio tajam, dan pemisah kolom vertikal tipis (`border-r border-blue-100/80`).
+- **Callout Kotak Pintar (*Ingat! / Tips*)**: Latar belakang kuning terang `#FFFBEB` dengan border tebal `#FFD84D/70`, sudut melengkung `rounded-3xl`, dan ikon lampu 💡.
+
+---
+
+## 5. Responsivitas & Pola Khusus Mobile
+
+1. **Optimasi Drag & Drop Mobile (`@dnd-kit`)**:
+   - `TouchSensor` terkalibrasi khusus: `delay: 150ms` dan `tolerance: 8px` agar pengguna dapat melakukan *scroll* halaman dengan normal tanpa memicu geseran kartu secara tidak sengaja.
+   - Pemanfaatan `createPortal(..., document.body)` untuk `<DragOverlay>`, membebaskan elemen kartu yang diangkat dari batasan CSS `transform` kontainer induk sehingga posisi kartu selalu presisi 1:1 di bawah jari pengguna.
+2. **Navigasi Mobile Navbar**:
+   - Menu dropdown mobile dengan animasi *spring entrance* GSAP (`back.out(1.4)`) dan backdrop blur semi-transparan `bg-slate-900/40`.
+3. **Editor Coding di Mobile**:
+   - Editor kode (`CodeEditor.tsx`) dan Live Preview (`LivePreview.tsx`) disusun bertumpuk secara vertikal yang rapi di layar smartphone dengan tombol aksi *Jalankan Kode* yang jelas.
+
+---
+
+## 6. Standar Aksesibilitas (a11y)
+
+- **Touch Targets**: Seluruh tombol interaktif, link navigasi, dan kartu opsi memiliki area sentuh minimal `44px x 44px`.
+- **Indikator Status Ganda**: Seluruh umpan balik (kuis atau validasi coding) memadukan teks pesan, warna, dan ikon (misal: ✓ / ✕ / ⚠️), sehingga tidak hanya bergantung pada persepsi warna.
+- **Fokus Keyboard**: Mendukung navigasi tombol Tab dengan *ring focus* yang jelas.

@@ -5963,3 +5963,121 @@ push
     - [`src/app/globals.css`](file:///d:/Coding/codekids/src/app/globals.css): Pembersihan `forwards` dan penyetelan `transform: none` pada `.animate-page-enter` untuk mengeliminasi containing block bug.
     - [`prompts/RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md): Dokumentasi Prompt 162 & 163.
   - Melakukan staging (`git add .`), commit deskriptif, dan `git push origin main`.
+
+---
+
+## Prompt 164
+
+Tanggal: 2026-10-15
+
+Task: Penyesuaian Jumlah Materi di Course Grid Learning Hub & Harmonisasi Level 3
+
+### Prompt Asli
+
+```text
+itu materinya sesuaikan lagi kan seinget ku bukan 5 coba cek berapa kemudian perbaiki
+```
+
+### Analisis & Hasil Pengecekan
+
+1. **Hasil Pengecekan Data Materi Aktual**:
+   - **Level 01 (Apa itu Coding?)**: Terdiri dari **3 Materi** pembelajaran (`LEVEL_1_SECTIONS.length === 3`) + Kuis 5 Soal.
+   - **Level 02 (Algorithm)**: Terdiri dari **3 Materi** pembelajaran (`LEVEL_2_SECTIONS.length === 3`) + Klaim Sertifikat.
+   - **Level 03 (HTML)**: Terdiri dari **3 Materi** bacaan dasar + 1 Coding Practice + Klaim Sertifikat.
+   - **Level 04 (CSS)**: Terdiri dari **3 Materi** bacaan dasar + 1 Coding Practice + Klaim Sertifikat.
+   - **Level 05 (JavaScript)**: Direncanakan **3 Materi** dasar (Coming Soon).
+   - **Level 06 (Final Project)**: Merupakan **1 Proyek** integrasi / Tugas Akhir (Coming Soon).
+2. **Penyebab Nilai "5 Materi" Muncul**:
+   - Sebelumnya pada [`src/components/learn/CourseGrid.tsx`](file:///d:/Coding/codekids/src/components/learn/CourseGrid.tsx), nilai `materials: '5 Materi'` tertulis secara *hardcoded* untuk semua kartu dari artefak inisialisasi awal PRD sebelum kurikulum disederhanakan menjadi 3 materi per level.
+
+### Solusi & Ringkasan Hasil
+
+- **Pembaruan Kartu Kurikulum ([`src/components/learn/CourseGrid.tsx`](file:///d:/Coding/codekids/src/components/learn/CourseGrid.tsx))**:
+  - Mengubah jumlah materi pada kartu Level 01 s.d. Level 05 dari `'5 Materi'` menjadi `'3 Materi'`.
+  - Mengubah kartu Level 06 (Final Project) menjadi `'1 Proyek'` dengan subteks `'Tugas Akhir'`.
+  - Menjadikan atribut gambar `alt` dan subteks label dinamis sesuai data kartu (`card.materials` dan `card.subMaterials || 'Pembelajaran'`).
+- **Harmonisasi Indikator Level 03 ([`src/content/level3Data.ts`](file:///d:/Coding/codekids/src/content/level3Data.ts) & [`src/components/lesson/Level3LessonReader.tsx`](file:///d:/Coding/codekids/src/components/lesson/Level3LessonReader.tsx))**:
+  - Menyelaraskan teks badge dari `LEVEL 03 • MATERI X DARI 4` menjadi `LEVEL 03 • MATERI X DARI 3` dan subtext di `level3Data.ts` agar 100% konsisten dengan progress bar serta format Level 04.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lolos tanpa kendala tipe TypeScript.
+
+---
+
+## Prompt 165
+
+Tanggal: 2026-10-15
+
+Task: CodeKids Documentation Reconciliation (Audit Menyeluruh & Penyelarasan Dokumentasi dengan Implementasi Aktual)
+
+### Prompt Asli
+
+```text
+# TASK: CODEKIDS DOCUMENTATION RECONCILIATION
+
+## 1. OBJECTIVE
+
+Audit dan perbarui dokumentasi Markdown (.md) dalam project CodeKids agar sesuai dengan implementasi website, fitur, desain, kurikulum, dan arsitektur teknis yang benar-benar ada saat ini.
+
+Selama development, CodeKids telah mengalami berbagai perubahan dan improvement. Oleh karena itu, beberapa dokumen awal mungkin sudah tidak sesuai dengan kondisi project terbaru.
+
+Tugas ini adalah menyelaraskan dokumentasi dengan kondisi aktual project, bukan mengembalikan website ke spesifikasi awal.
+
+PRINSIP UTAMA: UPDATE DOCUMENTATION TO MATCH THE IMPLEMENTATION, NOT THE IMPLEMENTATION TO MATCH THE DOCUMENTATION.
+```
+
+### Ringkasan Hasil
+
+- **Prinsip Kepatuhan Ketat (*Documentation Only*)**:
+  - Nol perubahan terhadap source code, UI, komponen, logika, asset, dependencies, atau styling (`.tsx`, `.ts`, `.css`). Seluruh perubahan 100% eksklusif pada berkas dokumentasi `.md`.
+- **Pembaruan Berkas Dokumentasi**:
+  1. [`README.md`](file:///d:/Coding/codekids/README.md):
+     - Memperbarui deskripsi stack ke Next.js 16.3.8 (App Router), React 19.2.8, TypeScript 5.x, Tailwind CSS v4.
+     - Menyajikan tabel kurikulum riil (Level 1–4 Implemented, Level 5–6 Planned).
+     - Mendokumentasikan fitur unggulan: AI Chatbot Tutor (Gemini API), Galeri Sertifikatku, generator PDF vektor `@react-pdf/renderer`, kalibrasi touch drag-and-drop mobile `@dnd-kit`, dan Lottie Loader.
+     - Memperbarui pohon struktur direktori proyek sesuai keberadaan file nyata di `src/`.
+  2. [`docs/PRD.md`](file:///d:/Coding/codekids/docs/PRD.md):
+     - Membagi fitur secara tegas dalam matriks: *Implemented* (Beranda, Hub, Level 1–4, Kuis, Drag & Drop, Editor HTML/CSS, Galeri Sertifikatku, AI Tutor, LocalStorage), *Partially Implemented* (Rute kuis langsung Level 1), dan *Planned* (Level 5 JavaScript & Level 6 Final Project).
+     - Mengoreksi arsitektur routing: latihan coding diintegrasikan langsung (*inline*) pada pembaca materi (tanpa rute `/practice` atau `/project` terpisah yang tidak terpakai).
+  3. [`docs/DESIGN_SYSTEM.md`](file:///d:/Coding/codekids/docs/DESIGN_SYSTEM.md):
+     - Mendokumentasikan token warna riil: Core Palette (`#4F7DF3`, `#17233C`, `#FFD84D`, `#42C88A`, `#FF6B6B`, `#F6F8FC`) dan palet tematik per level (Biru, Amber, Rose, Emerald, Purple, Sky).
+     - Mendokumentasikan tipografi aktif via `next/font/google`: Fredoka, Nunito, JetBrains Mono, Geist.
+     - Mendokumentasikan tata letak langsung bebas kartu bertumpuk (*card-free direct layout*), sticky bottom navigation bar dengan padding proteksi `pb-28 sm:pb-32`, serta optimasi mobile sensor touch `@dnd-kit` (150ms delay, 8px tolerance, tombol panah cepat ▲/▼, React Portal mounting).
+  4. [`docs/CURRICULUM.md`](file:///d:/Coding/codekids/docs/CURRICULUM.md):
+     - Menyelaraskan seluruh materi aktif ke standar 3 Materi per level (Level 1: 3 Materi + Kuis 5 Soal; Level 2: 3 Materi termasuk Buat Jus drag & drop + sertifikat; Level 3: 3 Materi + 1 Praktik Coding HTML 3 tantangan + sertifikat; Level 4: 3 Materi + 1 Praktik Coding CSS 3 tantangan + sertifikat).
+     - Menandai Level 5 (JavaScript) dan Level 6 (Final Project) sebagai *Planned (Coming Soon)*.
+     - Menyelaraskan kontrak tipe data TypeScript kurikulum dengan `src/types/curriculum.ts`.
+  5. [`docs/TECHNICAL_SPEC.md`](file:///d:/Coding/codekids/docs/TECHNICAL_SPEC.md):
+     - Memperbarui versi teknologi: Next.js 16.3.8, React 19.2.8, Tailwind CSS v4.
+     - Mendokumentasikan dependensi aktif nyata: `@dnd-kit`, `@react-pdf/renderer`, `@google/generative-ai`, `@lottiefiles/dotlottie-react`, `gsap`, `katex`.
+     - Mendokumentasikan arsitektur keamanan sandbox `<iframe>` (`allow-scripts`, sanitasi, peletakan script di head), lapisan persistensi `localStorage` (`codekids_user_progress_v1`, alias rute, SSR safe), dan arsitektur AI Tutor (fallback cascade 5 model Gemini & cooldown system).
+  6. [`docs/AI_AGENT_RULES.md`](file:///d:/Coding/codekids/docs/AI_AGENT_RULES.md):
+     - Mengembangkan menjadi 16 aturan baku dengan penambahan aturan pencatatan `RAW_PROMPT_LOG.md`, kalibrasi mobile touch sensor, dan klausul *Documentation-Only Safeguard*.
+  7. [`AGENTS.md`](file:///d:/Coding/codekids/AGENTS.md) & [`CLAUDE.md`](file:///d:/Coding/codekids/CLAUDE.md):
+     - Menjaga keutuhan blok `nextjs-agent-rules` bawaan Next.js 16 serta menambahkan panduan pintas dan tautan dokumen proyek.
+
+
+
+---
+
+## Prompt 166
+
+Tanggal: 2026-10-15
+
+Task: Push Seluruh Pembaruan Rekonsiliasi Dokumentasi dan Sinkronisasi Kurikulum 3 Materi ke GitHub Repository
+
+### Prompt Asli
+
+```text
+push got
+```
+
+### Ringkasan Hasil
+
+- **Sinkronisasi Kode & Dokumentasi ke GitHub**:
+  - Menyiapkan berkas-berkas yang diperbarui:
+    - Kurikulum & Kartu Belajar: [`src/components/learn/CourseGrid.tsx`](file:///d:/Coding/codekids/src/components/learn/CourseGrid.tsx), [`src/components/lesson/Level3LessonReader.tsx`](file:///d:/Coding/codekids/src/components/lesson/Level3LessonReader.tsx), [`src/content/level3Data.ts`](file:///d:/Coding/codekids/src/content/level3Data.ts).
+    - Dokumentasi Proyek: [`README.md`](file:///d:/Coding/codekids/README.md), [`docs/PRD.md`](file:///d:/Coding/codekids/docs/PRD.md), [`docs/DESIGN_SYSTEM.md`](file:///d:/Coding/codekids/docs/DESIGN_SYSTEM.md), [`docs/CURRICULUM.md`](file:///d:/Coding/codekids/docs/CURRICULUM.md), [`docs/TECHNICAL_SPEC.md`](file:///d:/Coding/codekids/docs/TECHNICAL_SPEC.md), [`docs/AI_AGENT_RULES.md`](file:///d:/Coding/codekids/docs/AI_AGENT_RULES.md), [`AGENTS.md`](file:///d:/Coding/codekids/AGENTS.md), [`CLAUDE.md`](file:///d:/Coding/codekids/CLAUDE.md).
+    - Log Perkembangan: [`prompts/RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md).
+  - Melakukan staging (`git add .`), commit deskriptif, dan `git push origin main`.
+- **Verifikasi Kualitas**:
+  - `npx tsc --noEmit`: 100% lolos tanpa kendala tipe TypeScript.

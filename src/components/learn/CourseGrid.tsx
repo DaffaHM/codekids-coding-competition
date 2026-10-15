@@ -12,6 +12,7 @@ interface CourseCardData {
   subLevel: string;
   certificate: string;
   materials: string;
+  subMaterials?: string;
   buttonText: string;
   href: string;
   isComingSoon?: boolean;
@@ -31,7 +32,7 @@ const courseCards: CourseCardData[] = [
     level: 'Level Dasar',
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
-    materials: '5 Materi',
+    materials: '3 Materi',
     buttonText: 'Mulai Belajar',
     href: '/learn/level-1',
     buttonStyles: {
@@ -48,7 +49,7 @@ const courseCards: CourseCardData[] = [
     level: 'Level Dasar',
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
-    materials: '5 Materi',
+    materials: '3 Materi',
     buttonText: 'Mulai Belajar',
     href: '/learn/level-2',
     buttonStyles: {
@@ -65,7 +66,7 @@ const courseCards: CourseCardData[] = [
     level: 'Level Dasar',
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
-    materials: '5 Materi',
+    materials: '3 Materi',
     buttonText: 'Mulai Belajar',
     href: '/learn/level-3',
     buttonStyles: {
@@ -82,7 +83,7 @@ const courseCards: CourseCardData[] = [
     level: 'Level Dasar',
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
-    materials: '5 Materi',
+    materials: '3 Materi',
     buttonText: 'Mulai Belajar',
     href: '/learn/level-4',
     buttonStyles: {
@@ -99,7 +100,7 @@ const courseCards: CourseCardData[] = [
     level: 'Level Dasar',
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
-    materials: '5 Materi',
+    materials: '3 Materi',
     buttonText: 'Coming Soon',
     href: '#',
     isComingSoon: true,
@@ -117,7 +118,8 @@ const courseCards: CourseCardData[] = [
     level: 'Level Dasar',
     subLevel: 'Pemula',
     certificate: 'Sertifikat',
-    materials: '5 Materi',
+    materials: '1 Proyek',
+    subMaterials: 'Tugas Akhir',
     buttonText: 'Coming Soon',
     href: '#',
     isComingSoon: true,
@@ -202,7 +204,7 @@ export default function CourseGrid() {
                   <div className="w-10 h-10 sm:w-11 sm:h-11 relative mb-1 flex items-center justify-center">
                     <Image
                       src="/booksicon.png"
-                      alt="5 Materi"
+                      alt={card.materials}
                       width={64}
                       height={64}
                       className="w-full h-full object-contain"
@@ -212,7 +214,7 @@ export default function CourseGrid() {
                     {card.materials}
                   </span>
                   <span className="text-[11px] font-semibold text-[#718096] leading-tight mt-0.5">
-                    Pembelajaran
+                    {card.subMaterials || 'Pembelajaran'}
                   </span>
                 </div>
               </div>

@@ -1,23 +1,25 @@
 # CodeKids — AI Agent Working Rules
 
-These rules govern all automated and AI-assisted development work on the CodeKids repository. Every AI assistant, agent, or developer collaborating on this project MUST follow these guidelines strictly without exception.
+Aturan ini mengikat seluruh pengembangan otomatis dan berbantuan AI (*AI-assisted development*) pada repositori CodeKids. Setiap asisten AI, agent, atau pengembang yang berkolaborasi dalam proyek ini **WAJIB** mematuhi panduan ini secara mutlak tanpa pengecualian.
 
 ---
 
-## The 15 Mandatory Rules
+## 16 Aturan Wajib Pengembangan (*The 16 Mandatory Rules*)
 
-1. **Read Project Documentation First**: Always inspect `/docs/PRD.md`, `/docs/DESIGN_SYSTEM.md`, `/docs/CURRICULUM.md`, and `/docs/TECHNICAL_SPEC.md` before making architectural or visual changes.
-2. **Preserve Existing Design Decisions**: Do not alter established color palettes, typography specs, or layout patterns unless explicitly requested by the project lead.
-3. **Do Not Introduce Unnecessary Libraries**: Rely on native Web APIs, React built-ins, and Tailwind CSS. Always evaluate native solutions before considering new npm packages.
-4. **Do Not Redesign Unrelated Components**: When fixing a bug or adding a feature to a specific page or component, keep your scope strictly bounded. Do not touch unrelated pages.
-5. **Reuse Existing Components**: Search the codebase for existing UI components (`src/components/ui/`) before creating custom elements.
-6. **Maintain Responsive Behavior**: Every interface modification must look clean and operate smoothly across Mobile, Tablet, and Desktop screens.
-7. **Maintain Accessibility (a11y)**: Ensure clear contrast ratios, visible focus outlines, keyboard navigation support, visible icons alongside colors, and proper ARIA labels.
-8. **Avoid Unnecessary Abstraction**: Keep code straightforward, readable, and typed. Do not introduce over-engineered design patterns, factory classes, or complex state managers.
-9. **Explain Significant Technical Decisions**: When introducing architectural changes or refactoring core logic, document your rationale clearly in code comments or PR commit messages.
-10. **Test Affected Functionality**: Always verify interactive behaviors (such as quiz scoring, editor compilation, or navigation) after implementing changes.
-11. **Check for Build & Type Errors**: Run `npm run build` and TypeScript checks (`npx tsc --noEmit`) to verify zero compilation or lint errors before marking a task complete.
-12. **Do Not Remove Working Functionality**: Never delete working code, tests, or features without explicit task justification.
-13. **Keep UI Consistent with `DESIGN_SYSTEM.md`**: Follow exact hex values (`#4F7DF3`, `#17233C`, `#FFD84D`, `#42C88A`, `#FF6B6B`), font definitions, and spacing tokens.
-14. **Keep Content Appropriate for Grades 4–6**: Ensure tone, explanations, and instructions are clear, friendly, and accessible for ages 9–12.
-15. **Prioritize Real User Experience Over Visual Novelty**: Focus on clarity, immediate feedback, and intuitive learning flow over flashy animations or complex 3D graphics.
+1. **Baca Dokumentasi Proyek Terlebih Dahulu (*Read Docs First*)**: Selalu periksa [`docs/PRD.md`](file:///d:/Coding/codekids/docs/PRD.md), [`docs/DESIGN_SYSTEM.md`](file:///d:/Coding/codekids/docs/DESIGN_SYSTEM.md), [`docs/CURRICULUM.md`](file:///d:/Coding/codekids/docs/CURRICULUM.md), dan [`docs/TECHNICAL_SPEC.md`](file:///d:/Coding/codekids/docs/TECHNICAL_SPEC.md) sebelum melakukan perubahan arsitektur atau visual.
+2. **Pertahankan Keputusan Desain yang Ada (*Preserve Design Decisions*)**: Jangan mengubah palet warna resmi (`#4F7DF3`, `#17233C`, `#FFD84D`, `#42C88A`, `#FF6B6B`), font, radius tombol (*pill shape*), atau pola layout tanpa persetujuan eksplisit.
+3. **Kebijakan Dependensi Ketat (*No Unnecessary Libraries*)**: Andalkan Web API native, React 19, dan Tailwind CSS v4. Dilarang menginstal editor berat (Monaco, CodeMirror, Ace) atau library animasi berlebih.
+4. **Ruang Lingkup Terbatas (*Strictly Bounded Scope*)**: Saat memperbaiki bug atau menambahkan fitur pada komponen/halaman tertentu, batasi perubahan hanya pada file target. Jangan menyentuh halaman atau komponen yang tidak terkait.
+5. **Gunakan Kembali Komponen yang Ada (*Reuse Existing Components*)**: Periksa direktori `src/components/` sebelum membuat elemen baru.
+6. **Jaga Responsivitas & Kalibrasi Mobile (*Maintain Mobile UX*)**: Antarmuka harus beroperasi sempurna di Mobile, Tablet, dan Desktop. Pada interaksi drag-and-drop (`@dnd-kit`), wajib mempertahankan sensor sentuh terkalibrasi (`delay: 150ms`, `tolerance: 8px`), tombol panah cepat mobile (▲/▼), dan isolasi React Portal (`document.body`) agar tidak terjadi offset bug pada layar ponsel.
+7. **Patuhi Standar Aksesibilitas (*Maintain a11y*)**: Pastikan rasio kontras tinggi, cincin fokus keyboard jelas, indikator status ganda (warna + ikon), dan ukuran area sentuh minimal `44px x 44px`.
+8. **Hindari Abstraksi Berlebihan (*Avoid Over-Engineering*)**: Tulis kode yang ringkas, mudah dibaca, dan bertipe kuat. Hindari *factory pattern* atau *state manager* rumit jika `useState` dan utilitas penyimpanan sederhana sudah memadai.
+9. **Pencatatan Log Prompt Wajib (*Maintain RAW_PROMPT_LOG.md*)**: Setiap prompt development asli dari pengguna wajib dicatat nomor urut, tanggal, teks prompt asli, dan ringkasan hasilnya ke dalam [`prompts/RAW_PROMPT_LOG.md`](file:///d:/Coding/codekids/prompts/RAW_PROMPT_LOG.md). Jangan pernah menghapus, meringkas, atau mengubah entri log historis yang sudah ada.
+10. **Uji Fungsionalitas Terdampak (*Test Affected Behaviors*)**: Selalu verifikasi alur interaktif (penilaian kuis, drag-and-drop sortable, eksekusi live sandbox editor, dan alur klaim sertifikat) setelah melakukan modifikasi.
+11. **Pemeriksaan Wajib Tipe & Build (*Zero Error Policy*)**: Selalu jalankan `npx tsc --noEmit` untuk memastikan 0 error tipe TypeScript sebelum menandai tugas selesai.
+12. **Jangan Hapus Fungsionalitas yang Sudah Berjalan (*Never Break Working Code*)**: Dilarang menghapus atau merusak fitur, kuis, atau halaman yang sudah bekerja tanpa justifikasi dan izin tertulis.
+13. **Jaga Keselarasan Konten Ramah Anak (*Age-Appropriate Content*)**: Gunakan bahasa Indonesia yang ramah, santun, jelas, dan mudah dipahami oleh siswa usia 9–12 tahun (Kelas 4–6 SD).
+14. **Utamakan Nilai Edukasi daripada Gimik (*Prioritize Learning Value*)**: Fokus pada pemahaman konsep dan umpan balik langsung, bukan animasi berlebihan atau mekanik gamifikasi yang mengaburkan esensi materi.
+15. **Perlindungan Data Klien (*Client-Side Privacy & Persistence*)**: Seluruh data progres disimpan secara lokal di browser pengguna (`localStorage`). Pastikan selalu aman dari SSR hydration mismatch dengan pembacaan pasca-*mount*.
+16. **Tugas Dokumentasi Hanya untuk Dokumentasi (*Documentation-Only Safeguard*)**: Ketika menerima instruksi audit, rekonsiliasi, atau penulisan dokumentasi, dilarang keras mengubah source code (`.tsx`, `.ts`, `.css`), komponen, atau konfigurasi. **Perbarui dokumentasi agar sesuai dengan implementasi, bukan mengubah implementasi agar sesuai dengan dokumentasi.**
+
